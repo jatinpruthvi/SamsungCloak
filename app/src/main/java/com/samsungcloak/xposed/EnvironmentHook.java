@@ -1,14 +1,5 @@
 package com.samsungcloak.xposed;
 
-import android.app.ActivityManager;
-import android.content.Intent;
-import android.hardware.display.DisplayManager;
-import android.os.Bundle;
-import android.telephony.TelephonyManager;
-import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.InputDevice;
-
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
@@ -43,7 +34,9 @@ public class EnvironmentHook {
 
     private static void hookBatteryIntent(XC_LoadPackage.LoadPackageParam lpparam) {
         try {
-            XposedBridge.hookAllMethods(Intent.class, "getIntExtra", new XC_MethodHook() {
+            Class<?> intentClass = XposedHelpers.findClass("android.content.Intent", lpparam.classLoader);
+
+            XposedBridge.hookAllMethods(intentClass, "getIntExtra", new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     try {
@@ -140,7 +133,9 @@ public class EnvironmentHook {
 
     private static void hookDisplayMetrics(XC_LoadPackage.LoadPackageParam lpparam) {
         try {
-            XposedBridge.hookAllMethods(Display.class, "getMetrics", new XC_MethodHook() {
+            Class<?> displayClass = XposedHelpers.findClass("android.view.Display", lpparam.classLoader);
+
+            XposedBridge.hookAllMethods(displayClass, "getMetrics", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     try {
@@ -163,7 +158,7 @@ public class EnvironmentHook {
                 }
             });
 
-            XposedBridge.hookAllMethods(Display.class, "getRealMetrics", new XC_MethodHook() {
+            XposedBridge.hookAllMethods(displayClass, "getRealMetrics", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     try {
@@ -194,7 +189,9 @@ public class EnvironmentHook {
 
     private static void hookInputDevice(XC_LoadPackage.LoadPackageParam lpparam) {
         try {
-            XposedBridge.hookAllMethods(InputDevice.class, "getName", new XC_MethodHook() {
+            Class<?> inputDeviceClass = XposedHelpers.findClass("android.view.InputDevice", lpparam.classLoader);
+
+            XposedBridge.hookAllMethods(inputDeviceClass, "getName", new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     param.setResult("sec_touchscreen");
@@ -202,15 +199,17 @@ public class EnvironmentHook {
                 }
             });
 
-            XposedBridge.hookAllMethods(InputDevice.class, "getSources", new XC_MethodHook() {
+            XposedBridge.hookAllMethods(inputDeviceClass, "getSources", new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    param.setResult(InputDevice.SOURCE_TOUCHSCREEN | InputDevice.SOURCE_KEYBOARD);
+                    int sourceTouchscreen = XposedHelpers.getStaticIntField(inputDeviceClass, "SOURCE_TOUCHSCREEN");
+                    int sourceKeyboard = XposedHelpers.getStaticIntField(inputDeviceClass, "SOURCE_KEYBOARD");
+                    param.setResult(sourceTouchscreen | sourceKeyboard);
                     HookUtils.logDebug("InputDevice.getSources() modified");
                 }
             });
 
-            XposedBridge.hookAllMethods(InputDevice.class, "getVendorId", new XC_MethodHook() {
+            XposedBridge.hookAllMethods(inputDeviceClass, "getVendorId", new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     param.setResult(1449);
@@ -218,7 +217,7 @@ public class EnvironmentHook {
                 }
             });
 
-            XposedBridge.hookAllMethods(InputDevice.class, "getProductId", new XC_MethodHook() {
+            XposedBridge.hookAllMethods(inputDeviceClass, "getProductId", new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     param.setResult(5747);
@@ -226,7 +225,7 @@ public class EnvironmentHook {
                 }
             });
 
-            XposedBridge.hookAllMethods(InputDevice.class, "getDescriptor", new XC_MethodHook() {
+            XposedBridge.hookAllMethods(inputDeviceClass, "getDescriptor", new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     param.setResult("1449:5747");
