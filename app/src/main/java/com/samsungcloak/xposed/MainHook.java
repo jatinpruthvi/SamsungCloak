@@ -42,6 +42,12 @@ public class MainHook implements IXposedHookLoadPackage {
                 NetworkSimulator.init(lpparam);
                 TouchSimulator.init(lpparam);
                 TimingController.init(lpparam);
+                MotionSimulator.init(lpparam);
+                VibrationSimulator.init(lpparam);
+                GPUHook.init(lpparam);
+                ThermalHook.init(lpparam);
+                PowerHook.init(lpparam);
+                DeepSleepHook.init(lpparam);
             }
 
             HookUtils.logInfo("SamsungCloak loaded successfully for: " + lpparam.packageName);
