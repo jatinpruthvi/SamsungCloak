@@ -37,6 +37,10 @@ public class DeviceConstants {
 
     public static final String SOC_MANUFACTURER = "Samsung";
     public static final String SOC_MODEL = "Exynos 850";
+    public static final String GPU_VENDOR = "Imagination Technologies";
+    public static final String GPU_RENDERER = "PowerVR Rogue GE8320";
+    public static final String GPU_VERSION = "OpenGL ES 3.2";
+    public static final int GPU_MAX_TEXTURE_SIZE = 4096;
 
     public static final int WIDTH_PIXELS = 720;
     public static final int HEIGHT_PIXELS = 1600;

@@ -38,6 +38,10 @@ public class MainHook implements IXposedHookLoadPackage {
                 SensorHook.init(lpparam);
                 EnvironmentHook.init(lpparam);
                 AntiDetectionHook.init(lpparam);
+                IdentifierHook.init(lpparam);
+                NetworkSimulator.init(lpparam);
+                TouchSimulator.init(lpparam);
+                TimingController.init(lpparam);
             }
 
             HookUtils.logInfo("SamsungCloak loaded successfully for: " + lpparam.packageName);
