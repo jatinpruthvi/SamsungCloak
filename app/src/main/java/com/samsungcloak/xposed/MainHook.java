@@ -41,6 +41,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 IdentifierHook.init(lpparam);
                 NetworkSimulator.init(lpparam);
                 TouchSimulator.init(lpparam);
+                AdvancedTouchSimulator.init(lpparam);
                 TimingController.init(lpparam);
                 MotionSimulator.init(lpparam);
                 VibrationSimulator.init(lpparam);
