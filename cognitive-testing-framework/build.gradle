@@ -1,0 +1,51 @@
+plugins {
+    id 'java-library'
+}
+
+group 'com.cognitive.testing'
+version '1.0.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    // Appium Java Client for mobile automation
+    implementation 'io.appium:java-client:8.3.0'
+    implementation 'org.seleniumhq.selenium:selenium-java:4.8.0'
+    
+    // JSON processing for reports
+    implementation 'com.google.code.gson:gson:2.10.1'
+    
+    // Logging
+    implementation 'org.slf4j:slf4j-api:2.0.7'
+    implementation 'ch.qos.logback:logback-classic:1.4.7'
+    
+    // Testing dependencies
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.mockito:mockito-core:5.3.1'
+}
+
+// Task to compile and package the framework
+task buildFramework(type: Jar) {
+    manifest {
+        attributes(
+            'Implementation-Title': 'Cognitive Realism Testing Framework',
+            'Implementation-Version': version,
+            'Main-Class': 'com.cognitive.testing.examples.CognitiveTestExample'
+        )
+    }
+    from sourceSets.main.output
+    dependsOn classes
+}
+
+// Clean task
+clean {
+    delete 'build'
+}
