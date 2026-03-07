@@ -74,6 +74,67 @@ Traditional test automation is "too rational" - it follows optimal paths, makes 
 
 **Tests**: UI flexibility, multiple interaction paths, accessibility
 
+---
+
+## Environmental Stress Model (NEW!)
+
+**Overview**: Simulates volatile real-world conditions often missed by synthetic tests. Ensures "Real-world usage is messy" by simultaneously applying multiple environmental stressors during automated testing.
+
+### 5 Environmental Realism Hooks
+
+#### 1. Network Instability Simulation
+Dynamic network state transitions (4G ↔ 3G ↔ 2G ↔ No Connection) with latency injection and failure simulation.
+
+**Tests**: Data sync reliability, API retry logic, offline mode transitions, network recovery handling.
+
+#### 2. Device Interruption Logic
+Simulates system events (calls, updates, alarms) that force app into background during critical tasks.
+
+**Tests**: Background task resilience, session state preservation, activity lifecycle, critical operation recovery.
+
+#### 3. Battery Constraint Modeling
+Simulates battery drain and power save mode behavior with performance throttling.
+
+**Tests**: Performance degradation under power save, battery-optimized path execution, energy-efficient features.
+
+#### 4. Notification Distractions
+"Push notification hijacking" that randomly diverts focus to different apps.
+
+**Tests**: Session state recovery, notification handling impact, user journey interruption, app resumption behavior.
+
+#### 5. Context Switching Entropy
+"App hopping" simulation where agent switches between target app and browser/social apps.
+
+**Tests**: Multi-session resilience, task abandonment handling, app state preservation, context-aware features.
+
+### Quick Start
+
+```java
+// Initialize with Galaxy A12 optimized settings
+EnvironmentalConfig config = EnvironmentalConfig.galaxyA12Stress();
+EnvironmentalStressModel stressModel = new EnvironmentalStressModel(config, targetApp);
+stressModel.start();
+
+// Process interactions with environmental stress
+for (int i = 0; i < 100; i++) {
+    stressModel.processInteraction();
+    performTestAction();
+    stressModel.beforeNetworkOperation();
+    if (!stressModel.shouldNetworkOperationFail()) {
+        performNetworkCall();
+    }
+}
+
+// Generate report
+stressModel.stop();
+System.out.println(stressModel.generateReport());
+```
+
+### Documentation
+- **[ENVIRONMENTAL_STRESS_MODEL.md](./ENVIRONMENTAL_STRESS_MODEL.md)** - Complete Environmental Stress Model documentation
+- **[QUICKSTART_ENVIRONMENTAL.md](./QUICKSTART_ENVIRONMENTAL.md)** - Quick start guide
+- **[EnvironmentalStressExample.java](./src/main/java/com/cognitive/testing/environmental/EnvironmentalStressExample.java)** - Comprehensive examples
+
 ## Architecture
 
 ### Core Components
@@ -92,6 +153,16 @@ com.cognitive.testing/
 │   ├── DecisionFatigueHook.java    # Error rates & response times
 │   ├── ImperfectMemoryHook.java    # Re-verification & memory decay
 │   └── ChangingPreferencesHook.java # Dynamic preference changes
+├── environmental/                  # Environmental Stress Model (NEW!)
+│   ├── EnvironmentalConfig.java     # Configuration for environmental hooks
+│   ├── EnvironmentalStressModel.java # Orchestrator coordinating all hooks
+│   ├── NetworkInstabilityHook.java # Network volatility simulation
+│   ├── DeviceInterruptionHook.java # System event simulation
+│   ├── BatteryConstraintHook.java  # Battery/power save simulation
+│   ├── NotificationDistractionHook.java # Notification hijacking
+│   ├── ContextSwitchingHook.java   # App hopping entropy
+│   ├── EnvironmentalStressExample.java # Comprehensive examples
+│   └── EnvironmentalStressTest.java # Validation tests
 ├── automation/
 │   ├── CognitiveTestFramework.java # Main framework integration
 │   └── AppiumCognitiveDriver.java  # Appium driver with cognitive behavior
