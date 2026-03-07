@@ -77,6 +77,55 @@ Run `./setup_project.sh` to view the complete file mapping and project organizat
 - **[DOCUMENTATION_AUDIT_REPORT.md](./DOCUMENTATION_AUDIT_REPORT.md)** - Documentation consistency audit report
 - **[OPTIONAL_HOOK_IMPLEMENTATIONS.md](./OPTIONAL_HOOK_IMPLEMENTATIONS.md)** - Optional hook implementations for edge cases
 
+## Cognitive Testing Framework
+
+This repository also includes a comprehensive **Cognitive Realism Testing Framework** for simulating human-like behavior in Android mobile testing.
+
+### Environmental Stress Model (NEW!)
+
+A high-fidelity chaos testing suite for Samsung Galaxy A12 (SM-A125U) that simulates volatile real-world conditions often missed by synthetic tests.
+
+**Key Features**:
+- **Network Instability Simulation**: Dynamic 4G/3G/2G transitions with latency injection
+- **Device Interruption Logic**: System events forcing app to background
+- **Battery Constraint Modeling**: Power save mode behavior with performance throttling
+- **Notification Distractions**: Push notification hijacking and focus loss simulation
+- **Context Switching Entropy**: App hopping multitasking with task abandonment
+
+**Documentation**:
+- **[ENVIRONMENTAL_STRESS_MODEL_README.md](./ENVIRONMENTAL_STRESS_MODEL_README.md)** - Complete implementation summary
+- **[cognitive-testing-framework/ENVIRONMENTAL_STRESS_MODEL.md](./cognitive-testing-framework/ENVIRONMENTAL_STRESS_MODEL.md)** - Comprehensive documentation
+- **[cognitive-testing-framework/QUICKSTART_ENVIRONMENTAL.md](./cognitive-testing-framework/QUICKSTART_ENVIRONMENTAL.md)** - Quick start guide
+
+**Quick Start**:
+```java
+EnvironmentalConfig config = EnvironmentalConfig.galaxyA12Stress();
+EnvironmentalStressModel stressModel = new EnvironmentalStressModel(config, targetApp);
+stressModel.start();
+
+for (int i = 0; i < 100; i++) {
+    stressModel.processInteraction();
+    performTestAction();
+    stressModel.beforeNetworkOperation();
+    if (!stressModel.shouldNetworkOperationFail()) {
+        performNetworkCall();
+    }
+}
+
+stressModel.stop();
+System.out.println(stressModel.generateReport());
+```
+
+**Cognitive Hooks**:
+- Limited Attention Span
+- Bounded Rationality (Satisficing)
+- Emotional Bias Simulation
+- Decision Fatigue
+- Imperfect Memory
+- Changing Preferences
+
+See **[cognitive-testing-framework/README.md](./cognitive-testing-framework/README.md)** for complete framework documentation.
+
 ## License
 
 See LICENSE file for details.
