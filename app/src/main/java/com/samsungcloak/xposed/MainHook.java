@@ -54,6 +54,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 ClipboardSecurityHook.init(lpparam);
                 TemporalRealismHook.init(lpparam);
                 CognitiveFidelityHook.init(lpparam);
+                SentimentEngagementHook.init(lpparam);
             }
 
             HookUtils.logInfo("SamsungCloak loaded successfully for: " + lpparam.packageName);
