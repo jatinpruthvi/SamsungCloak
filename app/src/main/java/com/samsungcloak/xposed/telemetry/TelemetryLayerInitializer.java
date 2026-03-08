@@ -15,6 +15,11 @@ public class TelemetryLayerInitializer {
     private static volatile boolean networkTopologyInitialized = false;
     private static volatile boolean microVibrationInitialized = false;
     private static volatile boolean errorHandlingInitialized = false;
+    private static volatile boolean ambientSensoryInitialized = false;
+    private static volatile boolean accessibilityProfileInitialized = false;
+    private static volatile boolean notificationInterruptionInitialized = false;
+    private static volatile boolean fingerprintVariabilityInitialized = false;
+    private static volatile boolean backgroundNoiseInitialized = false;
 
     private static final String SM_A125U_MODEL = "SM-A125U";
     private static final String SM_A125U_MANUFACTURER = "samsung";
@@ -43,6 +48,12 @@ public class TelemetryLayerInitializer {
             Thread.sleep(50);
             
             initializeErrorHandling(lpparam);
+            
+            initializeAmbientSensoryCorrelation(lpparam);
+            initializeAccessibilityProfile(lpparam);
+            initializeNotificationInterruption(lpparam);
+            initializeFingerprintVariability(lpparam);
+            initializeBackgroundNoise(lpparam);
             
             printInitializationSummary();
             
@@ -111,6 +122,66 @@ public class TelemetryLayerInitializer {
             errorHandlingInitialized = false;
         }
     }
+    
+    private static void initializeAmbientSensoryCorrelation(XC_LoadPackage.LoadPackageParam lpparam) {
+        try {
+            AmbientSensoryCorrelationHook.init(lpparam);
+            ambientSensoryInitialized = AmbientSensoryCorrelationHook.isInitialized();
+            XposedBridge.log(LOG_TAG + " [6/10] Ambient Sensory Correlation: " + 
+                (ambientSensoryInitialized ? "OK" : "FAILED"));
+        } catch (Exception e) {
+            XposedBridge.log(LOG_TAG + " [6/10] Ambient Sensory Correlation: FAILED - " + e.getMessage());
+            ambientSensoryInitialized = false;
+        }
+    }
+    
+    private static void initializeAccessibilityProfile(XC_LoadPackage.LoadPackageParam lpparam) {
+        try {
+            AccessibilityProfileDiversityHook.init(lpparam);
+            accessibilityProfileInitialized = AccessibilityProfileDiversityHook.isInitialized();
+            XposedBridge.log(LOG_TAG + " [7/10] Accessibility Profile Diversity: " + 
+                (accessibilityProfileInitialized ? "OK" : "FAILED"));
+        } catch (Exception e) {
+            XposedBridge.log(LOG_TAG + " [7/10] Accessibility Profile Diversity: FAILED - " + e.getMessage());
+            accessibilityProfileInitialized = false;
+        }
+    }
+    
+    private static void initializeNotificationInterruption(XC_LoadPackage.LoadPackageParam lpparam) {
+        try {
+            NotificationDrivenInterruptionHook.init(lpparam);
+            notificationInterruptionInitialized = NotificationDrivenInterruptionHook.isInitialized();
+            XposedBridge.log(LOG_TAG + " [8/10] Notification-Driven Interruption: " + 
+                (notificationInterruptionInitialized ? "OK" : "FAILED"));
+        } catch (Exception e) {
+            XposedBridge.log(LOG_TAG + " [8/10] Notification-Driven Interruption: FAILED - " + e.getMessage());
+            notificationInterruptionInitialized = false;
+        }
+    }
+    
+    private static void initializeFingerprintVariability(XC_LoadPackage.LoadPackageParam lpparam) {
+        try {
+            PerceptualFingerprintVariabilityHook.init(lpparam);
+            fingerprintVariabilityInitialized = PerceptualFingerprintVariabilityHook.isInitialized();
+            XposedBridge.log(LOG_TAG + " [9/10] Perceptual Fingerprint Variability: " + 
+                (fingerprintVariabilityInitialized ? "OK" : "FAILED"));
+        } catch (Exception e) {
+            XposedBridge.log(LOG_TAG + " [9/10] Perceptual Fingerprint Variability: FAILED - " + e.getMessage());
+            fingerprintVariabilityInitialized = false;
+        }
+    }
+    
+    private static void initializeBackgroundNoise(XC_LoadPackage.LoadPackageParam lpparam) {
+        try {
+            BiometricSignalBackgroundNoiseHook.init(lpparam);
+            backgroundNoiseInitialized = BiometricSignalBackgroundNoiseHook.isInitialized();
+            XposedBridge.log(LOG_TAG + " [10/10] Biometric Signal Background Noise: " + 
+                (backgroundNoiseInitialized ? "OK" : "FAILED"));
+        } catch (Exception e) {
+            XposedBridge.log(LOG_TAG + " [10/10] Biometric Signal Background Noise: FAILED - " + e.getMessage());
+            backgroundNoiseInitialized = false;
+        }
+    }
 
     private static void printInitializationSummary() {
         int successCount = 0;
@@ -119,12 +190,17 @@ public class TelemetryLayerInitializer {
         if (networkTopologyInitialized) successCount++;
         if (microVibrationInitialized) successCount++;
         if (errorHandlingInitialized) successCount++;
+        if (ambientSensoryInitialized) successCount++;
+        if (accessibilityProfileInitialized) successCount++;
+        if (notificationInterruptionInitialized) successCount++;
+        if (fingerprintVariabilityInitialized) successCount++;
+        if (backgroundNoiseInitialized) successCount++;
 
         XposedBridge.log(LOG_TAG + " ==============================================================");
-        XposedBridge.log(LOG_TAG + " Initialization Summary: " + successCount + "/5 components active");
+        XposedBridge.log(LOG_TAG + " Initialization Summary: " + successCount + "/10 components active");
         
-        if (successCount == 5) {
-            XposedBridge.log(LOG_TAG + " High-Fidelity Telemetry Layer fully operational");
+        if (successCount == 10) {
+            XposedBridge.log(LOG_TAG + " Environmental & System Integrity Layer fully operational");
             XposedBridge.log(LOG_TAG + " Target Device: " + SM_A125U_MODEL + " (" + SM_A125U_MANUFACTURER + ")");
         } else {
             XposedBridge.log(LOG_TAG + " WARNING: Partial initialization - some components failed");
@@ -139,7 +215,12 @@ public class TelemetryLayerInitializer {
                naturalisticInputJitterInitialized && 
                networkTopologyInitialized && 
                microVibrationInitialized && 
-               errorHandlingInitialized;
+               errorHandlingInitialized &&
+               ambientSensoryInitialized &&
+               accessibilityProfileInitialized &&
+               notificationInterruptionInitialized &&
+               fingerprintVariabilityInitialized &&
+               backgroundNoiseInitialized;
     }
 
     public static boolean isComponentInitialized(ComponentType component) {
@@ -154,6 +235,16 @@ public class TelemetryLayerInitializer {
                 return microVibrationInitialized;
             case ERROR_HANDLING:
                 return errorHandlingInitialized;
+            case AMBIENT_SENSORY_CORRELATION:
+                return ambientSensoryInitialized;
+            case ACCESSIBILITY_PROFILE_DIVERSITY:
+                return accessibilityProfileInitialized;
+            case NOTIFICATION_INTERRUPTION:
+                return notificationInterruptionInitialized;
+            case FINGERPRINT_VARIABILITY:
+                return fingerprintVariabilityInitialized;
+            case BACKGROUND_NOISE:
+                return backgroundNoiseInitialized;
             default:
                 return false;
         }
@@ -164,7 +255,12 @@ public class TelemetryLayerInitializer {
         NATURALISTIC_INPUT_JITTER,
         NETWORK_TOPOLOGY,
         MICRO_VIBRATION,
-        ERROR_HANDLING
+        ERROR_HANDLING,
+        AMBIENT_SENSORY_CORRELATION,
+        ACCESSIBILITY_PROFILE_DIVERSITY,
+        NOTIFICATION_INTERRUPTION,
+        FINGERPRINT_VARIABILITY,
+        BACKGROUND_NOISE
     }
 
     public static void setNetworkProfile(NetworkTopologySimulationHook.ConnectionProfile profile) {
