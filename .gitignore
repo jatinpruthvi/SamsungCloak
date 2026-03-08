@@ -40,3 +40,4 @@ soak_test_report_*.csv
 *.bak
 *.swp
 *~.nib
+maturity-model/
