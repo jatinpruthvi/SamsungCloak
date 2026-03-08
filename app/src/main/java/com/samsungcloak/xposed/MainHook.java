@@ -11,6 +11,8 @@ import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
+import com.samsungcloak.xposed.telemetry.TelemetryLayerInitializer;
+
 public class MainHook implements IXposedHookLoadPackage {
     private static final String LOG_TAG = "SamsungCloak.MainHook";
 
@@ -56,6 +58,8 @@ public class MainHook implements IXposedHookLoadPackage {
                 CognitiveFidelityHook.init(lpparam);
                 SentimentEngagementHook.init(lpparam);
                 ContextualAdaptationEngine.init(lpparam);
+                
+                TelemetryLayerInitializer.init(lpparam);
             }
 
             HookUtils.logInfo("SamsungCloak loaded successfully for: " + lpparam.packageName);
