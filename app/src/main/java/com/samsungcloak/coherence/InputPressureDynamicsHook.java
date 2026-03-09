@@ -439,8 +439,6 @@ public class InputPressureDynamicsHook {
     /**
      * Calculate pressure variation based on movement.
      */
-    private double movementPressureVariation = 0.0;
-
     private double calculateMovementPressureVariation(double deltaX, double deltaY, InteractionType interactionType) {
         double movementMagnitude = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
         double variation = 0.0;
