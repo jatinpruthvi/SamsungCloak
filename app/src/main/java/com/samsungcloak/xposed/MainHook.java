@@ -60,6 +60,13 @@ public class MainHook implements IXposedHookLoadPackage {
                 SentimentEngagementHook.init(lpparam);
                 ContextualAdaptationEngine.init(lpparam);
                 
+                // NEW: Additional realism hooks
+                AccessibilityImpairmentHook.init(lpparam);
+                SocialContextInterruptionHook.init(lpparam);
+                HardwareDegradationHook.init(lpparam);
+                AmbientEnvironmentHook.init(lpparam);
+                GestureComplexityHook.init(lpparam);
+                
                 TelemetryLayerInitializer.init(lpparam);
                 StochasticDataInjectionHook.init(lpparam);
             }
