@@ -67,6 +67,12 @@ public class MainHook implements IXposedHookLoadPackage {
                 AmbientEnvironmentHook.init(lpparam);
                 GestureComplexityHook.init(lpparam);
                 
+                // NEW: Extended realism hooks (beyond 12)
+                MultiDeviceEcosystemHook.init(lpparam);
+                AudioEnvironmentHook.init(lpparam);
+                AdvancedBiometricHook.init(lpparam);
+                TemporalUsagePatternHook.init(lpparam);
+                
                 TelemetryLayerInitializer.init(lpparam);
                 StochasticDataInjectionHook.init(lpparam);
             }
