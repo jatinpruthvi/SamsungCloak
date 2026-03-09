@@ -1,272 +1,240 @@
-# User Evolution Model - Longitudinal Performance Testing
+# Human Interaction Simulation Xposed Module
 
-A Java-based simulation framework for conducting 90-day soak tests that audit app retention and UI adaptation on mobile devices, specifically designed for Samsung Galaxy A12 (SM-A125U).
+A comprehensive Xposed module that injects realistic human interaction patterns into the Android framework for high-fidelity hardware-in-the-loop testing on Samsung Galaxy A12 (SM-A125U).
 
-## Overview
+## 🎯 Overview
 
-This project implements "Longitudinal Realism Hooks" to simulate how user interaction matures over time, providing high-fidelity data for long-term retention audits. The model reflects the reality that real users change their behavior, skills, and engagement patterns throughout their lifecycle.
+This module enables devices to generate perfectly synchronized physical and software-state telemetry, mimicking genuine human use. It's designed for HCI research, application robustness testing, accessibility validation, and sensor-fusion algorithm testing.
 
-## Core Components
+### Target Device
+- **Model**: Samsung Galaxy A12 (SM-A125U)
+- **Android Version**: 10/11
+- **Screen**: 6.5" PLS TFT, 720×1600 pixels
 
-### 1. Skill Improvement (Power User Curve)
+## ✨ Features
 
-**Location:** `com.evolution.skill.SkillImprovementCurve`
+### 1. Mechanical Micro-Error Hook
+Simulates realistic touch input errors and fat-finger mistakes:
+- Near-miss offsets when tapping near button edges
+- Partial cancellation patterns
+- Correction swipes during scrolling
+- Velocity-based micro-jitter
 
-Models how users become more proficient over time:
-- **Navigation Latency**: Decreases from 2500ms (new user) to 400ms (power user)
-- **Error Rate**: Drops from 15% to 0.5% as users learn the UI
-- **Learning Rate**: Varies by lifecycle phase (fastest during onboarding, slower for power users)
+### 2. Sensor-Fusion Coherence Hook
+Ensures coherent sensor data when GPS indicates walking:
+- 1.8 Hz step-cycle oscillations on accelerometer/gyroscope
+- Speed-scaled amplitude matching pedestrian motion
+- Time-correlated Gaussian noise
+- Gravity fluctuation simulation
 
-```java
-SkillImprovementCurve skillCurve = new SkillImprovementCurve(90);
-skillCurve.updateSkillForDay(day, lifecycleState, sessionsToday);
-double proficiencyScore = skillCurve.getSkillProficiencyScore();
-```
+### 3. Inter-App Navigation Hook
+Simulates realistic referral flows and deep-link navigation:
+- Deep-link context injection (referrer, UTM parameters)
+- Referral flow simulation from common sources
+- Back stack modification without launching apps
+- Context-aware navigation history
 
-### 2. Interest Drift & Habit Formation
+### 4. Input Pressure & Surface Area Dynamics Hook
+Varies touch pressure and surface area based on interaction type:
+- Button tap pressure dynamics (0.85-0.97 initial contact)
+- Scrolling pressure patterns (lower, 0.4-0.65)
+- Touch major/minor axis variation
+- Velocity-dependent pressure decay
 
-**Locations:** 
-- `com.evolution.interest.InterestDriftModel`
-- `com.evolution.interest.MarkovTransitionMatrix`
+### 5. Asymmetric Latency Hook
+Injects variable delays after UI loads, mimicking human perceptual processing:
+- Post-load hesitation periods (20-50% of load latency)
+- Cognitive load factor based on recent view changes
+- Input blocking during processing
+- Complexity-based delay calculation
 
-Uses a Markov Chain model to simulate behavioral evolution:
-- **Habit Strength**: Increases with repeated module visits
-- **Boredom Scores**: Increase with overuse of specific features
-- **Probabilistic Transitions**: Module visitation probabilities shift over time
-- **Novelty Seeking**: Users explore new features when boredom is high
+## 📋 Requirements
 
-```java
-InterestDriftModel interestModel = new InterestDriftModel();
-interestModel.updateInterestForDay(day, moduleVisits);
-AppModule nextModule = interestModel.selectNextModule();
+- Android device with Android 10/11
+- Root access (Magisk recommended)
+- LSPosed Framework installed
+- Android SDK for building
 
-MarkovTransitionMatrix markovMatrix = new MarkovTransitionMatrix();
-markovMatrix.adaptToHabits(habitStrengths, boredomScores);
-AppModule nextState = markovMatrix.getNextState(currentModule);
-```
+## 🚀 Quick Start
 
-### 3. Realistic Drop-off Patterns
-
-**Location:** `com.evolution.churn.ChurnModel`
-
-Implements dynamic churn probability based on multiple factors:
-- **Latency Impact**: High navigation latency increases churn risk
-- **Error Rate Impact**: Excessive errors trigger churn triggers
-- **Low Engagement**: Consecutive days of low engagement increase churn probability
-- **Lifecycle Milestones**: Critical churn points at day 7, 30, 60
-- **Retention Factors**: Positive experiences reduce churn probability
-
-```java
-ChurnModel churnModel = new ChurnModel();
-churnModel.updateChurnProbability(day, state, latencyMs, errorRate, sessions, duration);
-boolean hasChurned = churnModel.evaluateChurn();
-```
-
-### 4. Lifecycle Transition Logic
-
-**Location:** `com.evolution.lifecycle.LifecycleManager`
-
-Orchestrates transitions between user lifecycle phases:
-
-| Phase | Days | Behavior Characteristics |
-|-------|------|-------------------------|
-| **ONBOARDING** | 0-7 | Learning basics, high exploration, 2-4 sessions/day |
-| **EXPLORER** | 7-30 | Discovering features, moderate habits, 3-5 sessions/day |
-| **UTILITY** | 30-60 | Established routines, strong habits, 4-6 sessions/day |
-| **POWER_USER** | 60-90 | Mastered app, efficient interactions, 5-7 sessions/day |
-
-```java
-LifecycleManager manager = new LifecycleManager(90);
-while (manager.isSimulationActive()) {
-    manager.advanceDay();
-    SimulationSession session = manager.generateSession();
-}
-```
-
-## Running the Simulation
-
-### Command Line
+### Build from Source
 
 ```bash
-# Run default 90-day simulation
-java -cp target/classes com.evolution.SoakTestOrchestrator
+# Clone repository
+git clone <repository-url>
+cd HumanInteractionXposed
 
-# Specify custom duration and device ID
-java -cp target/classes com.evolution.SoakTestOrchestrator 60 SM-A125U-TEST-01
+# Build release APK
+./gradlew assembleRelease
+
+# Install via ADB
+adb install -r app/build/outputs/apk/release/app-release.apk
 ```
 
-### Programmatic Usage
+### Install and Configure
+
+1. Install LSPosed Framework on your rooted device
+2. Install the compiled APK
+3. Open LSPosed Manager
+4. Enable "Human Interaction Simulator" module
+5. Add target apps to scope (e.g., TikTok: `com.zhiliaoapp.musically`)
+6. Force stop target apps
+7. Reboot device
+
+### Verify Installation
+
+```bash
+adb logcat | grep "HumanInteraction"
+```
+
+Look for: "All hooks initialized successfully"
+
+## ⚙️ Configuration
+
+### Preset Modes
 
 ```java
-SoakTestOrchestrator orchestrator = new SoakTestOrchestrator(90, "SM-A125U");
-orchestrator.runSimulation();
+// High-fidelity mode (maximum realism)
+HumanInteractionModule.ConfigurationAPI.setHighFidelityMode(true);
+
+// Standard mode (balanced)
+HumanInteractionModule.ConfigurationAPI.setHighFidelityMode(false);
+
+// Minimal interference mode (subtle)
+HumanInteractionModule.ConfigurationAPI.setMinimalInterferenceMode();
 ```
 
-## Output Files
-
-### Daily Metrics (`metrics_day_XXX.csv`)
-Generated every 10 days:
-- `day`: Current simulation day
-- `lifecycle_state`: Current lifecycle phase
-- `skill_proficiency`: User skill score (0.0-1.0)
-- `latency_ms`: Average navigation latency
-- `error_rate`: Current error rate
-- `churn_probability`: Current churn risk
-- `sessions_today`: Number of sessions on this day
-
-### Final Report (`soak_test_report_DEVICE_YYYYMMDD_HHMMSS.csv`)
-Complete session-by-session data:
-- `session_id`: Sequential session identifier
-- `day`: Simulation day
-- `lifecycle_state`: Lifecycle phase during session
-- `duration_seconds`: Session length
-- `total_interactions`: Number of module visits
-- `latency_ms`: Navigation latency during session
-- `error_rate`: Error rate during session
-
-## Architecture
-
-```
-com.evolution
-├── model/
-│   ├── AppModule.java           # App feature modules
-│   ├── InteractionMetric.java   # Performance metrics
-│   └── LifecycleState.java      # User lifecycle phases
-├── skill/
-│   └── SkillImprovementCurve.java  # Power user simulation
-├── interest/
-│   ├── InterestDriftModel.java  # Habit & boredom dynamics
-│   └── MarkovTransitionMatrix.java # Module transition patterns
-├── churn/
-│   └── ChurnModel.java          # Churn probability engine
-├── lifecycle/
-│   ├── LifecycleManager.java    # Main orchestrator
-│   └── SimulationSession.java   # Session data container
-└── SoakTestOrchestrator.java    # Test runner
-```
-
-## Key Algorithms
-
-### Learning Rate Calculation
+### Individual Hook Control
 
 ```java
-private double calculateLearningRate(LifecycleState state, int day) {
-    return switch (state) {
-        case ONBOARDING -> 0.25;  // Fast learning
-        case EXPLORER -> 0.15;
-        case UTILITY -> 0.08;
-        case POWER_USER -> 0.03; // Diminishing returns
-    };
-}
+// Mechanical errors
+HumanInteractionModule.ConfigurationAPI.setMechanicalErrorRate(0.08);
+
+// Sensor fusion
+HumanInteractionModule.ConfigurationAPI.setSensorFusionWalkingState(true, 1.5);
+
+// Referral flows
+HumanInteractionModule.ConfigurationAPI.setReferralFlowProbability(0.18);
+
+// Touch pressure
+HumanInteractionModule.ConfigurationAPI.setTouchPressureVariation(0.25);
+
+// Latency
+HumanInteractionModule.ConfigurationAPI.setHesitationProbability(0.30);
 ```
 
-### Experience Factor
+## 📚 Documentation
 
-Uses exponential decay to simulate cumulative learning:
-```java
-experienceFactor = 1.0 - exp(-3.0 * (day / totalDays))
+- **[Implementation Guide](HUMAN_INTERACTION_HOOKS_IMPLEMENTATION.md)** - Detailed technical implementation of each hook
+- **[Build & Usage Guide](BUILD_AND_USAGE_GUIDE.md)** - Complete build, install, and usage instructions
+- **[Architecture](#architecture)** - Module architecture and design
+
+## 🏗️ Architecture
+
+```
+HumanInteractionModule (Entry Point)
+├── MechanicalMicroErrorHook
+│   ├── View.onTouchEvent
+│   └── ViewRootImpl.dispatchInputEvent
+├── SensorFusionCoherenceHook
+│   ├── SystemSensorManager.dispatchSensorEvent
+│   └── Location.getSpeed/setSpeed
+├── InterAppNavigationHook
+│   ├── Instrumentation.execStartActivity
+│   ├── Activity.onResume
+│   └── TaskStackBuilder.startActivities
+├── InputPressureDynamicsHook
+│   ├── MotionEvent.obtain
+│   ├── View.onTouchEvent
+│   └── GestureDetector.onScroll
+└── AsymmetricLatencyHook
+    ├── Activity.onResume
+    ├── Fragment.onResume
+    ├── Choreographer.postCallback
+    └── ViewRootImpl.dispatchInputEvent
 ```
 
-### Churn Probability
+## 🔬 Use Cases
 
-Combines base probability with triggers and retention factors:
-```
-finalProb = baseProb + Σ(churnTriggers) + Σ(retentionFactors)
-```
+### 1. HCI Research
+- Study realistic touch interaction patterns
+- Validate Fitts' law implementations
+- Analyze pressure-based gesture recognition
 
-## Configuration
+### 2. App Robustness Testing
+- Test error recovery from fat-finger mistakes
+- Validate referral handling and deep-link navigation
+- Test latency tolerance and UI responsiveness
 
-Modify constants in respective classes to adjust simulation parameters:
+### 3. Accessibility Algorithm Testing
+- Validate sensor-fusion algorithms with realistic data
+- Test accessibility features with simulated variations
+- Evaluate performance under realistic user patterns
 
-### Skill Improvement
-- `INITIAL_NAVIGATION_LATENCY_MS`: Starting latency (default: 2500ms)
-- `MIN_NAVIGATION_LATENCY_MS`: Achievable minimum (default: 400ms)
-- `INITIAL_ERROR_RATE`: Starting error rate (default: 0.15)
-- `MIN_ERROR_RATE`: Achievable minimum (default: 0.005)
+### 4. Hardware-in-the-Loop Testing
+- Generate synchronized telemetry for device testing
+- Validate sensor calibration algorithms
+- Test performance under realistic load patterns
 
-### Churn Model
-- `BASE_CHURN_PROBABILITY`: Daily churn risk (default: 0.001)
-- `HIGH_LATENCY_THRESHOLD_MS`: Latency trigger point (default: 5000ms)
-- `ERROR_RATE_THRESHOLD`: Error rate trigger (default: 0.10)
-- `MAX_CONSECUTIVE_LOW_ENGAGEMENT`: Days before churn (default: 5)
+## 📊 Performance
 
-## Extending the Model
+- **Overhead**: < 2ms per hook execution
+- **Memory**: < 5MB additional footprint
+- **Battery Impact**: Minimal (hooks are passive)
+- **APK Size**: ~30-50 KB
 
-### Adding New App Modules
+## ⚠️ Limitations
 
-Edit `AppModule.java`:
-```java
-NEW_FEATURE("new_feature", 0.05, 0.7)
-```
+1. Device-specific tuning needed for other models
+2. Walking simulation requires GPS signal (or spoofing)
+3. May conflict with other Xposed modules
+4. Latency blocking may interfere with some gesture recognizers
 
-### Custom Lifecycle Phases
+## 🔒 Compliance
 
-Add to `LifecycleState.java` enum and update transition logic in `LifecycleManager.java`.
+This module is designed for:
+- ✅ Research and testing purposes
+- ✅ Hardware-in-the-loop validation
+- ✅ Accessibility algorithm testing
+- ✅ App robustness evaluation
 
-### Custom Churn Triggers
+Ensure compliance with:
+- Target app terms of service
+- Local privacy regulations
+- Institutional review board requirements (if applicable)
 
-Extend `ChurnModel.java` with new trigger types in `applyXXXImpact` methods.
+## 🤝 Contributing
 
-## Testing Scenarios
+Contributions welcome! Please:
+1. Follow existing code style
+2. Add tests for new features
+3. Update documentation
+4. Submit pull requests with clear descriptions
 
-### Scenario 1: Normal Evolution
-```java
-LifecycleManager manager = new LifecycleManager(90);
-manager.runSimulation(); // Should see gradual skill improvement
-```
+## 📄 License
 
-### Scenario 2: Latency Stress Test
-```java
-manager.simulateLatencyIssue(3.0, 5); // 3x latency for 5 days
-// Monitor churn probability spike
-```
+MIT License - See LICENSE file for details
 
-### Scenario 3: Retention Analysis
-Compare churn patterns across multiple runs to identify retention bottlenecks.
+## 🙏 Acknowledgments
 
-## Device-Specific Considerations
+- Xposed Framework development team
+- LSPosed project
+- Samsung Galaxy A12 device profile
+- HCI research community
 
-### Samsung Galaxy A12 (SM-A125U)
-- **Display**: 720x1600 pixels, 6.5" PLS TFT
-- **Performance**: Consider adjusting latency baselines for device class
-- **Battery**: May affect session duration modeling
-- **Storage**: Could influence feature adoption rates
+## 📞 Support
 
-Adapt `INITIAL_NAVIGATION_LATENCY_MS` and session duration calculations based on device-specific performance characteristics.
+For issues or questions:
+1. Check [Build & Usage Guide](BUILD_AND_USAGE_GUIDE.md)
+2. Review [Implementation Documentation](HUMAN_INTERACTION_HOOKS_IMPLEMENTATION.md)
+3. Check LSPosed logs for errors
+4. Verify device compatibility (SM-A125U, Android 10/11)
 
-## Logging
+---
 
-The simulation uses SLF4J for comprehensive logging:
+**Version**: 1.0.0
+**Target Device**: Samsung Galaxy A12 (SM-A125U)
+**Android Version**: 10/11
+**Xposed API**: 82+
 
-```xml
-<dependency>
-    <groupId>org.slf4j</groupId>
-    <artifactId>slf4j-api</artifactId>
-    <version>2.0.9</version>
-</dependency>
-<dependency>
-    <groupId>ch.qos.logback</groupId>
-    <artifactId>logback-classic</artifactId>
-    <version>1.4.11</version>
-</dependency>
-```
-
-Configure logging levels in `src/main/resources/logback.xml` for detailed output.
-
-## Performance Considerations
-
-- Memory usage scales with simulation duration (~1MB per 10 days)
-- Markov matrix complexity is O(n²) where n = number of modules
-- Churn probability calculation is O(1) per day
-
-## Future Enhancements
-
-- Multi-user simulation for cohort analysis
-- A/B testing framework for UI variant comparison
-- Network condition simulation
-- Battery drain modeling
-- Social influence and referral dynamics
-
-## License
-
-Internal use - Samsung Device Testing Framework
+**Built with ❤️ for HCI research and robust application development**
