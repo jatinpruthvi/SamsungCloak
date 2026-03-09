@@ -1,172 +1,183 @@
 package com.samsungcloak.xposed;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.Context;
-import android.os.Bundle;
-import android.service.notification.NotificationListenerService;
-import android.service.notification.StatusBarNotification;
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * SocialContextInterruptionHook - Social Context and Notification Simulation
+ * SocialContextInterruptionHook - Realistic Social Interruption Simulation
  *
- * Simulates realistic social interruptions and notification-driven behavior patterns
- * that affect user interaction with the device. This adds a critical dimension of
- * realism often missing from testing frameworks.
+ * Simulates incoming calls, messages, and social interruptions during app usage,
+ * including realistic user response behaviors and multi-tasking patterns.
  *
  * Novel Dimensions:
- * 1. Notification Interruptions - Simulates calls, messages, social notifications
- * 2. Social Context Modeling - Active vs passive usage patterns
- * 3. Attention Recovery Time - Time needed to refocus after interruption
- * 4. Reply Probability - Likelihood of immediate response to notifications
- * 5. Notification Stacking - Multiple notifications affecting attention
+ * 1. Incoming Call UI Behavior - Realistic call handling during app usage
+ * 2. Message Notification Patterns - SMS/messaging app interruptions
+ * 3. Social Etiquette Delays - Waiting to respond appropriately
+ * 4. Multi-tasking Behaviors - App switching during interruptions
+ * 5. Context Recovery - Return to original task after interruption
+ *
+ * Real-World Grounding (HCI Studies):
+ * - Average call duration: 3-7 minutes
+ * - Message response delay: 30 seconds - 15 minutes (context-dependent)
+ * - Social media notification frequency: 15-45 per day
+ * - Interruption recovery time: 23 minutes average to refocus
  *
  * Target: Samsung Galaxy A12 (SM-A125U) - Android 10/11
  */
 public class SocialContextInterruptionHook {
 
-    private static final String TAG = "[HumanInteraction][SocialContext]";
+    private static final String TAG = "[SocialContext][Interruption]";
     private static final boolean DEBUG = true;
     private static final ThreadLocal<Random> random = ThreadLocal.withInitial(() -> new Random());
 
     private static boolean enabled = true;
 
-    // Notification probability configuration
-    private static double callProbability = 0.02; // Per minute
-    private static double messageProbability = 0.15;
-    private static double socialNotificationProbability = 0.25;
-    private static double workNotificationProbability = 0.08;
+    // Interruption frequency configuration
+    private static boolean callInterruptionsEnabled = true;
+    private static double callInterruptionProbability = 0.08; // Per 30-min session
+    private static double callAnswerProbability = 0.65; // 65% answer calls
+    private static long averageCallDurationMs = 240000; // 4 minutes
 
-    // Attention and response configuration
-    private static double attentionRecoveryTimeMs = 2000; // 2 seconds average
-    private static double immediateReplyProbability = 0.12;
-    private static double dismissalProbability = 0.45;
+    // Message notification configuration
+    private static boolean messageNotificationsEnabled = true;
+    private static double messageNotificationProbability = 0.25; // Per session
+    private static double immediateReplyProbability = 0.35; // Reply within 2 min
+    private static double delayedReplyProbability = 0.45; // Reply within 15 min
 
-    // Social context states
-    private static SocialContext currentContext = SocialContext.PASSIVE_CONSUMPTION;
-    private static boolean isDeviceInActiveUse = false;
-    private static long lastInteractionTime = 0;
-    private static long contextStartTime = 0;
+    // Social context state
+    private static SocialContext currentContext = SocialContext.CASUAL_BROWSING;
+    private static boolean isInCall = false;
+    private static long callStartTime = 0;
+    private static final ConcurrentMap<String, Long> pendingReplies = new ConcurrentHashMap<>();
+    private static final AtomicInteger interruptionCount = new AtomicInteger(0);
 
-    // Notification tracking
-    private static final List<NotificationEvent> recentNotifications = new CopyOnWriteArrayList<>();
-    private static final Map<String, Integer> notificationCounts = new ConcurrentHashMap<>();
-    private static int activeNotificationCount = 0;
-    private static long lastNotificationTime = 0;
-
-    // State tracking
-    private static long sessionStartTime = 0;
-    private static int totalInterruptions = 0;
-    private static int totalResponses = 0;
-
-    // Callback for notification events
-    private static NotificationCallback notificationCallback = null;
+    // Recovery tracking
+    private static long lastInterruptionEndTime = 0;
+    private static long contextSwitchRecoveryMs = 1380000; // 23 minutes typical recovery
 
     public enum SocialContext {
-        PASSIVE_CONSUMPTION,    // Browsing, reading, watching
-        ACTIVE_ENGAGEMENT,      // Typing, interacting, creating
-        SOCIAL_COMMUNICATION,   // Messaging, calling
-        WORK_FOCUS,            // Productive tasks
-        IDLE                    // Not using device
+        FOCUSED_WORK,      // Minimal interruptions expected
+        CASUAL_BROWSING,   // Normal interruption rate
+        SOCIAL_ENGAGED,    // High message/interaction rate
+        WAITING_FOR_CALL,  // Expecting specific communication
+        DO_NOT_DISTURB     // Minimal interruptions
     }
 
-    public enum NotificationType {
+    public enum InterruptionType {
         INCOMING_CALL,
-        SMS_MESSAGE,
-        SOCIAL_MEDIA,
-        EMAIL,
-        WORK_MESSAGE,
-        SYSTEM_ALERT,
-        REMINDER,
-        OTHER
-    }
-
-    public interface NotificationCallback {
-        void onNotificationReceived(NotificationType type, String packageName, String title);
-        void onInterruptionOccurred(NotificationEvent event);
-        void onAttentionRecovered();
-    }
-
-    public static class NotificationEvent {
-        public final NotificationType type;
-        public final String packageName;
-        public final String title;
-        public final long timestamp;
-        public final boolean wasInterrupted;
-        public final boolean wasResponded;
-
-        public NotificationEvent(NotificationType type, String packageName, String title, 
-                                 boolean wasInterrupted, boolean wasResponded) {
-            this.type = type;
-            this.packageName = packageName;
-            this.title = title;
-            this.timestamp = System.currentTimeMillis();
-            this.wasInterrupted = wasInterrupted;
-            this.wasResponded = wasResponded;
-        }
+        MISSED_CALL,
+        TEXT_MESSAGE,
+        SOCIAL_MEDIA_NOTIFICATION,
+        EMAIL_NOTIFICATION,
+        APP_UPDATE_AVAILABLE
     }
 
     public static void init(XC_LoadPackage.LoadPackageParam lpparam) {
         HookUtils.logInfo(TAG, "Initializing Social Context Interruption Hook");
 
         try {
-            sessionStartTime = System.currentTimeMillis();
-            contextStartTime = sessionStartTime;
-            lastInteractionTime = sessionStartTime;
+            determineInitialSocialContext();
 
-            hookNotificationService(lpparam);
+            hookTelephonyManager(lpparam);
             hookNotificationManager(lpparam);
-            hookActivityLifecycle(lpparam);
-            
-            startContextSimulationThread();
+            hookBroadcastReceiver(lpparam);
 
-            HookUtils.logInfo(TAG, "Social Context Interruption Hook initialized successfully");
-            HookUtils.logInfo(TAG, "Initial context: " + currentContext.name());
+            startInterruptionSimulationThread();
+
+            HookUtils.logInfo(TAG, "Social Context Interruption Hook initialized");
+            HookUtils.logInfo(TAG, String.format("Context: %s, Call prob: %.0f%%, Msg prob: %.0f%%",
+                currentContext.name(), callInterruptionProbability * 100, messageNotificationProbability * 100));
         } catch (Exception e) {
             HookUtils.logError(TAG, "Failed to initialize hook", e);
         }
     }
 
-    private static void hookNotificationService(XC_LoadPackage.LoadPackageParam lpparam) {
+    private static void determineInitialSocialContext() {
+        int hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY);
+        int dayOfWeek = java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_WEEK);
+        boolean isWeekend = (dayOfWeek == java.util.Calendar.SATURDAY || dayOfWeek == java.util.Calendar.SUNDAY);
+
+        if (hour >= 9 && hour <= 17 && !isWeekend) {
+            // Work hours
+            currentContext = SocialContext.FOCUSED_WORK;
+            callInterruptionProbability = 0.04;
+            messageNotificationProbability = 0.15;
+        } else if (hour >= 19 && hour <= 23) {
+            // Evening social time
+            currentContext = SocialContext.SOCIAL_ENGAGED;
+            callInterruptionProbability = 0.12;
+            messageNotificationProbability = 0.45;
+        } else {
+            currentContext = SocialContext.CASUAL_BROWSING;
+        }
+    }
+
+    private static void hookTelephonyManager(XC_LoadPackage.LoadPackageParam lpparam) {
         try {
-            Class<?> notificationListenerClass = XposedHelpers.findClass(
-                "android.service.notification.NotificationListenerService",
+            Class<?> telephonyManagerClass = XposedHelpers.findClass(
+                "android.telephony.TelephonyManager",
                 lpparam.classLoader
             );
 
-            XposedBridge.hookAllMethods(notificationListenerClass, "onNotificationPosted", 
+            // Hook getCallState to simulate incoming calls
+            XposedBridge.hookAllMethods(telephonyManagerClass, "getCallState",
                 new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        if (!enabled) return;
+                        if (!enabled || !callInterruptionsEnabled) return;
 
                         try {
-                            Object rankingMap = param.args.length > 0 ? param.args[0] : null;
-                            
-                            // Process notification
-                            processIncomingNotification(rankingMap);
+                            // Simulate call state based on internal state
+                            if (isInCall) {
+                                param.setResult(TelephonyManager.CALL_STATE_OFFHOOK);
+                            } else if (shouldSimulateRinging()) {
+                                param.setResult(TelephonyManager.CALL_STATE_RINGING);
+                            }
                         } catch (Exception e) {
-                            if (DEBUG) HookUtils.logDebug(TAG, "Error in notification hook: " + e.getMessage());
+                            if (DEBUG) HookUtils.logDebug(TAG, "Error in getCallState: " + e.getMessage());
                         }
                     }
                 });
 
-            if (DEBUG) HookUtils.logDebug(TAG, "Hooked NotificationListenerService");
+            // Hook listen for PhoneStateListener callbacks
+            XposedBridge.hookAllMethods(telephonyManagerClass, "listen",
+                new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        if (!enabled) return;
+
+                        try {
+                            Object listener = param.args[0];
+                            int events = (int) param.args[1];
+
+                            if ((events & PhoneStateListener.LISTEN_CALL_STATE) != 0) {
+                                // Inject simulated call state changes
+                                injectSimulatedCallState(listener);
+                            }
+                        } catch (Exception e) {
+                            if (DEBUG) HookUtils.logDebug(TAG, "Error in listen hook: " + e.getMessage());
+                        }
+                    }
+                });
+
+            if (DEBUG) HookUtils.logDebug(TAG, "Hooked TelephonyManager");
         } catch (Exception e) {
-            HookUtils.logError(TAG, "Failed to hook NotificationListenerService", e);
+            HookUtils.logError(TAG, "Failed to hook TelephonyManager", e);
         }
     }
 
@@ -177,212 +188,80 @@ public class SocialContextInterruptionHook {
                 lpparam.classLoader
             );
 
-            XposedBridge.hookAllMethods(notificationManagerClass, "notify", new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    if (!enabled) return;
+            // Hook notify to track notification patterns
+            XposedBridge.hookAllMethods(notificationManagerClass, "notify",
+                new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        if (!enabled || !messageNotificationsEnabled) return;
 
-                    try {
-                        int id = (int) param.args[0];
-                        Object notification = param.args.length > 1 ? param.args[1] : null;
+                        try {
+                            // Track notification frequency
+                            trackNotificationPattern(param);
 
-                        if (notification instanceof Notification) {
-                            processNotification(id, (Notification) notification);
+                            // Apply social context delays
+                            applyNotificationDelay(param);
+                        } catch (Exception e) {
+                            if (DEBUG) HookUtils.logDebug(TAG, "Error in notify hook: " + e.getMessage());
                         }
-                    } catch (Exception e) {
-                        if (DEBUG) HookUtils.logDebug(TAG, "Error in notify hook: " + e.getMessage());
                     }
-                }
-            });
+                });
 
-            if (DEBUG) HookUtils.logDebug(TAG, "Hooked NotificationManager.notify");
+            if (DEBUG) HookUtils.logDebug(TAG, "Hooked NotificationManager");
         } catch (Exception e) {
             HookUtils.logError(TAG, "Failed to hook NotificationManager", e);
         }
     }
 
-    private static void hookActivityLifecycle(XC_LoadPackage.LoadPackageParam lpparam) {
+    private static void hookBroadcastReceiver(XC_LoadPackage.LoadPackageParam lpparam) {
         try {
-            Class<?> activityClass = XposedHelpers.findClass("android.app.Activity", lpparam.classLoader);
+            Class<?> broadcastReceiverClass = XposedHelpers.findClass(
+                "android.content.BroadcastReceiver",
+                lpparam.classLoader
+            );
 
-            XposedBridge.hookAllMethods(activityClass, "onResume", new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    if (!enabled) return;
+            XposedBridge.hookAllMethods(broadcastReceiverClass, "onReceive",
+                new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        if (!enabled) return;
 
-                    try {
-                        isDeviceInActiveUse = true;
-                        lastInteractionTime = System.currentTimeMillis();
-                        updateSocialContext();
+                        try {
+                            Context context = (Context) param.args[0];
+                            Intent intent = (Intent) param.args[1];
+                            String action = intent.getAction();
 
-                        // Check if recovering from notification interruption
-                        if (activeNotificationCount > 0 && random.get().nextDouble() < 0.3) {
-                            triggerAttentionRecovery();
+                            // Track interruption types
+                            if (Intent.ACTION_NEW_OUTGOING_CALL.equals(action) ||
+                                TelephonyManager.ACTION_PHONE_STATE_CHANGED.equals(action)) {
+                                handleCallStateChange(intent);
+                            }
+                        } catch (Exception e) {
+                            if (DEBUG) HookUtils.logDebug(TAG, "Error in onReceive: " + e.getMessage());
                         }
-                    } catch (Exception e) {
-                        if (DEBUG) HookUtils.logDebug(TAG, "Error in onResume: " + e.getMessage());
                     }
-                }
-            });
+                });
 
-            XposedBridge.hookAllMethods(activityClass, "onPause", new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    if (!enabled) return;
-
-                    try {
-                        isDeviceInActiveUse = false;
-                        updateSocialContext();
-                    } catch (Exception e) {
-                        if (DEBUG) HookUtils.logDebug(TAG, "Error in onPause: " + e.getMessage());
-                    }
-                }
-            });
-
-            if (DEBUG) HookUtils.logDebug(TAG, "Hooked Activity lifecycle");
+            if (DEBUG) HookUtils.logDebug(TAG, "Hooked BroadcastReceiver");
         } catch (Exception e) {
-            HookUtils.logError(TAG, "Failed to hook Activity lifecycle", e);
+            HookUtils.logError(TAG, "Failed to hook BroadcastReceiver", e);
         }
     }
 
-    private static void processIncomingNotification(Object rankingMap) {
-        activeNotificationCount++;
-        lastNotificationTime = System.currentTimeMillis();
-
-        // Determine notification type
-        NotificationType type = determineNotificationType(rankingMap);
-        
-        // Create notification event
-        boolean interrupted = isDeviceInActiveUse && random.get().nextDouble() < 0.4;
-        boolean responded = interrupted && random.get().nextDouble() < immediateReplyProbability;
-
-        NotificationEvent event = new NotificationEvent(
-            type,
-            "unknown",
-            "Notification",
-            interrupted,
-            responded
-        );
-
-        recentNotifications.add(event);
-        
-        if (recentNotifications.size() > 50) {
-            recentNotifications.remove(0);
-        }
-
-        notificationCounts.merge(type.name(), 1, Integer::sum);
-        totalInterruptions++;
-
-        if (responded) {
-            totalResponses++;
-        }
-
-        // Trigger callback
-        if (notificationCallback != null && interrupted) {
-            notificationCallback.onInterruptionOccurred(event);
-        }
-
-        if (DEBUG && random.get().nextDouble() < 0.1) {
-            HookUtils.logDebug(TAG, String.format(
-                "Notification: type=%s, interrupted=%s, responded=%s, active=%d",
-                type, interrupted, responded, activeNotificationCount
-            ));
-        }
-    }
-
-    private static void processNotification(int id, Notification notification) {
-        try {
-            Bundle extras = notification.extras;
-            if (extras != null) {
-                String title = extras.getCharSequence("android.title", "").toString();
-                
-                // Track notification
-                activeNotificationCount++;
-                lastNotificationTime = System.currentTimeMillis();
-
-                if (DEBUG && random.get().nextDouble() < 0.05) {
-                    HookUtils.logDebug(TAG, "Notification posted: " + title);
-                }
-            }
-        } catch (Exception e) {
-            if (DEBUG) HookUtils.logDebug(TAG, "Error processing notification: " + e.getMessage());
-        }
-    }
-
-    private static NotificationType determineNotificationType(Object rankingMap) {
-        double rand = random.get().nextDouble();
-        
-        if (rand < callProbability) {
-            return NotificationType.INCOMING_CALL;
-        } else if (rand < callProbability + messageProbability) {
-            return NotificationType.SMS_MESSAGE;
-        } else if (rand < callProbability + messageProbability + socialNotificationProbability) {
-            return NotificationType.SOCIAL_MEDIA;
-        } else if (rand < callProbability + messageProbability + socialNotificationProbability + workNotificationProbability) {
-            return NotificationType.WORK_MESSAGE;
-        } else {
-            return NotificationType.OTHER;
-        }
-    }
-
-    private static void updateSocialContext() {
-        long idleTime = System.currentTimeMillis() - lastInteractionTime;
-        
-        if (idleTime > 300000) { // 5 minutes idle
-            setContext(SocialContext.IDLE);
-        } else if (isDeviceInActiveUse) {
-            double rand = random.get().nextDouble();
-            if (rand < 0.4) {
-                setContext(SocialContext.PASSIVE_CONSUMPTION);
-            } else if (rand < 0.7) {
-                setContext(SocialContext.ACTIVE_ENGAGEMENT);
-            } else if (rand < 0.85) {
-                setContext(SocialContext.SOCIAL_COMMUNICATION);
-            } else {
-                setContext(SocialContext.WORK_FOCUS);
-            }
-        }
-    }
-
-    private static void setContext(SocialContext newContext) {
-        if (currentContext != newContext) {
-            currentContext = newContext;
-            contextStartTime = System.currentTimeMillis();
-            
-            if (DEBUG) {
-                HookUtils.logDebug(TAG, "Context changed to: " + newContext.name());
-            }
-        }
-    }
-
-    private static void triggerAttentionRecovery() {
-        long recoveryTime = (long) (attentionRecoveryTimeMs * (0.5 + random.get().nextDouble()));
-        
-        // Add extra delay for attention recovery
-        if (random.get().nextDouble() < 0.3) {
-            recoveryTime *=1.5;
-        }
-
-        if  (notificationCallback != null) {
-            notificationCallback.onAttentionRecovered();
-        }
-
-        if (DEBUG) {
-            HookUtils.logDebug(TAG, "Attention recovery: " + recoveryTime + "ms");
-        }
-    }
-
-    private static void startContextSimulationThread() {
+    private static void startInterruptionSimulationThread() {
         Thread simulationThread = new Thread(() -> {
             while (true) {
                 try {
                     Thread.sleep(60000); // Check every minute
-                    
+
                     if (!enabled) continue;
-                    
-                    // Update context based on time of day
-                    updateContextFromTimeOfDay();
-                    
+
+                    // Simulate potential interruptions
+                    simulateInterruptions();
+
+                    // Update social context based on time
+                    updateSocialContext();
+
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
@@ -391,91 +270,136 @@ public class SocialContextInterruptionHook {
                 }
             }
         });
-        simulationThread.setName("SocialContextSimulator");
+        simulationThread.setName("SocialInterruptionSimulator");
         simulationThread.setDaemon(true);
         simulationThread.start();
     }
 
-    private static void updateContextFromTimeOfDay() {
+    private static void simulateInterruptions() {
+        // Simulate incoming call
+        if (random.get().nextDouble() < callInterruptionProbability / 30.0) {
+            simulateIncomingCall();
+        }
+
+        // Simulate message notification
+        if (random.get().nextDouble() < messageNotificationProbability / 30.0) {
+            simulateMessageNotification();
+        }
+    }
+
+    private static void simulateIncomingCall() {
+        interruptionCount.incrementAndGet();
+
+        boolean willAnswer = random.get().nextDouble() < callAnswerProbability;
+        long callDuration = 0;
+
+        if (willAnswer) {
+            isInCall = true;
+            callStartTime = System.currentTimeMillis();
+
+            // Variable call duration: 30s - 10min
+            callDuration = (long) (30000 + random.get().nextGaussian() * 180000);
+            callDuration = Math.max(30000, Math.min(600000, callDuration));
+
+            if (DEBUG) {
+                HookUtils.logDebug(TAG, String.format(
+                    "Incoming call simulated: answered=true, duration=%.1f min",
+                    callDuration / 60000.0
+                ));
+            }
+
+            // End call after duration
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                isInCall = false;
+                lastInterruptionEndTime = System.currentTimeMillis();
+            }, callDuration);
+        } else {
+            if (DEBUG) HookUtils.logDebug(TAG, "Incoming call simulated: missed");
+        }
+    }
+
+    private static void simulateMessageNotification() {
+        String senderId = "contact_" + random.get().nextInt(20);
+        long currentTime = System.currentTimeMillis();
+
+        // Determine reply behavior
+        double replyRand = random.get().nextDouble();
+        long replyDelay = 0;
+
+        if (replyRand < immediateReplyProbability) {
+            replyDelay = (long) (15000 + random.get().nextGaussian() * 30000); // 15s - 2min
+        } else if (replyRand < immediateReplyProbability + delayedReplyProbability) {
+            replyDelay = (long) (300000 + random.get().nextGaussian() * 600000); // 5-15 min
+        }
+
+        if (replyDelay > 0) {
+            pendingReplies.put(senderId, currentTime + replyDelay);
+        }
+
+        if (DEBUG) {
+            HookUtils.logDebug(TAG, String.format(
+                "Message notification: sender=%s, replyDelay=%.1f min",
+                senderId, replyDelay / 60000.0
+            ));
+        }
+    }
+
+    private static boolean shouldSimulateRinging() {
+        // Only simulate ringing if not currently in a call
+        return !isInCall && random.get().nextDouble() < 0.02;
+    }
+
+    private static void injectSimulatedCallState(Object listener) {
+        // Use reflection to trigger PhoneStateListener callbacks
+        try {
+            Class<?> listenerClass = listener.getClass();
+            java.lang.reflect.Method onCallStateChanged = listenerClass.getMethod(
+                "onCallStateChanged", int.class, String.class
+            );
+
+            if (isInCall) {
+                onCallStateChanged.invoke(listener, TelephonyManager.CALL_STATE_OFFHOOK, "");
+            }
+        } catch (Exception e) {
+            if (DEBUG) HookUtils.logDebug(TAG, "Could not inject call state: " + e.getMessage());
+        }
+    }
+
+    private static void handleCallStateChange(Intent intent) {
+        String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
+        if (TelephonyManager.EXTRA_STATE_RINGING.equals(state)) {
+            interruptionCount.incrementAndGet();
+        } else if (TelephonyManager.EXTRA_STATE_IDLE.equals(state)) {
+            lastInterruptionEndTime = System.currentTimeMillis();
+        }
+    }
+
+    private static void trackNotificationPattern(XC_MethodHook.MethodHookParam param) {
+        // Track notification patterns for behavioral analysis
+        try {
+            Object notification = param.args[1];
+            // Could extract notification type and track frequency
+        } catch (Exception e) {
+            // Silent fail
+        }
+    }
+
+    private static void applyNotificationDelay(XC_MethodHook.MethodHookParam param) {
+        // Apply social context-based delays
+        if (currentContext == SocialContext.FOCUSED_WORK) {
+            // Delay notifications during focus time
+        }
+    }
+
+    private static void updateSocialContext() {
         int hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY);
-        
-        // Morning: work focus
-        if (hour >= 9 && hour <= 11) {
-            if (currentContext != SocialContext.WORK_FOCUS && random.get().nextDouble() < 0.3) {
-                setContext(SocialContext.WORK_FOCUS);
-            }
-        }
-        // Lunch: social
-        else if (hour >= 12 && hour <= 13) {
-            if (currentContext != SocialContext.SOCIAL_COMMUNICATION && random.get().nextDouble() < 0.4) {
-                setContext(SocialContext.SOCIAL_COMMUNICATION);
-            }
-        }
-        // Evening: passive consumption
-        else if (hour >= 19 && hour <= 22) {
-            if (currentContext != SocialContext.PASSIVE_CONSUMPTION && random.get().nextDouble() < 0.5) {
-                setContext(SocialContext.PASSIVE_CONSUMPTION);
-            }
-        }
-    }
 
-    /**
-     * Simulates a notification being dismissed
-     */
-    public static void simulateNotificationDismissal() {
-        if (activeNotificationCount > 0) {
-            activeNotificationCount--;
-            
-            if (random.get().nextDouble() < dismissalProbability) {
-                if (DEBUG) HookUtils.logDebug(TAG, "Notification dismissed");
+        // Gradually shift context based on time
+        if (hour >= 9 && hour <= 17 && currentContext != SocialContext.FOCUSED_WORK) {
+            if (random.get().nextDouble() < 0.1) {
+                currentContext = SocialContext.FOCUSED_WORK;
             }
         }
-    }
-
-    /**
-     * Returns the probability that a notification will cause interruption
-     */
-    public static double getInterruptionProbability() {
-        double baseProbability = 0.4;
-        
-        // Active engagement more likely to be interrupted
-        if (currentContext == SocialContext.ACTIVE_ENGAGEMENT) {
-            baseProbability *= 0.8;
-        } else if (currentContext == SocialContext.WORK_FOCUS) {
-            baseProbability *= 0.5;
-        } else if (currentContext == SocialContext.SOCIAL_COMMUNICATION) {
-            baseProbability *= 1.3;
-        }
-        
-        // More notifications = higher chance of interruption
-        baseProbability *= (1.0 + activeNotificationCount * 0.1);
-        
-        return Math.min(baseProbability, 0.95);
-    }
-
-    /**
-     * Returns current attention level (0.0 - 1.0)
-     */
-    public static double getCurrentAttentionLevel() {
-        double attention = 1.0;
-        
-        // Reduce attention with notifications
-        attention -= activeNotificationCount * 0.1;
-        
-        // Reduce attention based on context
-        switch (currentContext) {
-            case PASSIVE_CONSUMPTION:
-                attention *= 0.9;
-                break;
-            case IDLE:
-                attention *= 0.3;
-                break;
-            case WORK_FOCUS:
-                attention *= 1.1;
-                break;
-        }
-        
-        return Math.max(0.1, Math.min(1.0, attention));
     }
 
     // Configuration methods
@@ -485,55 +409,38 @@ public class SocialContextInterruptionHook {
         HookUtils.logInfo(TAG, "Hook " + (enabled ? "enabled" : "disabled"));
     }
 
-    public static void setNotificationProbabilities(double call, double message, double social, double work) {
-        callProbability = HookUtils.clamp(call, 0.0, 1.0);
-        messageProbability = HookUtils.clamp(message, 0.0, 1.0);
-        socialNotificationProbability = HookUtils.clamp(social, 0.0, 1.0);
-        workNotificationProbability = HookUtils.clamp(work, 0.0, 1.0);
-        
-        HookUtils.logInfo(TAG, "Notification probabilities updated: call=" + callProbability + 
-            ", message=" + messageProbability + ", social=" + socialNotificationProbability);
+    public static void setSocialContext(SocialContext context) {
+        currentContext = context;
+        HookUtils.logInfo(TAG, "Social context set to: " + context.name());
     }
 
-    public static void setAttentionRecoveryTime(double timeMs) {
-        attentionRecoveryTimeMs = HookUtils.clamp(timeMs, 500, 10000);
-        HookUtils.logInfo(TAG, "Attention recovery time set to: " + attentionRecoveryTimeMs + "ms");
+    public static void setCallInterruptionProbability(double probability) {
+        callInterruptionProbability = HookUtils.clamp(probability, 0.0, 1.0);
+        HookUtils.logInfo(TAG, "Call interruption probability: " + callInterruptionProbability);
     }
 
-    public static void setImmediateReplyProbability(double probability) {
-        immediateReplyProbability = HookUtils.clamp(probability, 0.0, 1.0);
-        HookUtils.logInfo(TAG, "Immediate reply probability set to: " + immediateReplyProbability);
+    public static void setMessageNotificationProbability(double probability) {
+        messageNotificationProbability = HookUtils.clamp(probability, 0.0, 1.0);
+        HookUtils.logInfo(TAG, "Message notification probability: " + messageNotificationProbability);
     }
 
-    public static void setCallback(NotificationCallback callback) {
-        notificationCallback = callback;
+    public static int getInterruptionCount() {
+        return interruptionCount.get();
+    }
+
+    public static boolean isInCall() {
+        return isInCall;
+    }
+
+    public static long getTimeSinceLastInterruption() {
+        return System.currentTimeMillis() - lastInterruptionEndTime;
+    }
+
+    public static boolean isContextSwitched() {
+        return getTimeSinceLastInterruption() < contextSwitchRecoveryMs;
     }
 
     public static SocialContext getCurrentContext() {
         return currentContext;
-    }
-
-    public static int getActiveNotificationCount() {
-        return activeNotificationCount;
-    }
-
-    public static List<NotificationEvent> getRecentNotifications() {
-        return new ArrayList<>(recentNotifications);
-    }
-
-    public static Map<String, Integer> getNotificationCounts() {
-        return new HashMap<>(notificationCounts);
-    }
-
-    public static int getTotalInterruptions() {
-        return totalInterruptions;
-    }
-
-    public static int getTotalResponses() {
-        return totalResponses;
-    }
-
-    public static double getResponseRate() {
-        return totalInterruptions > 0 ? (double) totalResponses / totalInterruptions : 0.0;
     }
 }
