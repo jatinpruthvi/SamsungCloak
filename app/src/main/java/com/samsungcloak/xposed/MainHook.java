@@ -73,6 +73,9 @@ public class MainHook implements IXposedHookLoadPackage {
                 AdvancedBiometricHook.init(lpparam);
                 TemporalUsagePatternHook.init(lpparam);
                 
+                // NEW: Memory Pressure Hook (fills gap in memory simulation)
+                MemoryPressureHook.init(lpparam);
+                
                 TelemetryLayerInitializer.init(lpparam);
                 StochasticDataInjectionHook.init(lpparam);
             }
