@@ -76,23 +76,25 @@ public class RealismStateManager {
      */
     public RealismSystemState getSystemState() {
         RealismSystemState state = new RealismSystemState();
-        
+
         // Gather state from all hooks
         state.haptic = HapticFeedbackRealismHook.getState();
         state.notifications = NotificationInterruptionHook.getState();
         state.biometric = BiometricRealismHook.getState();
         state.deviceGrip = DeviceGripAndOrientationHook.getState();
         state.power = PowerStateManagementHook.getState();
-        
+        state.audioEnvironment = AudioEnvironmentRealismHook.getState();
+        state.gpsTrajectory = GPSLocationTrajectoryHook.getState();
+
         // System context
         state.system = sSystemContext;
-        
+
         // Activity context
         state.activity = sActivityContext;
-        
+
         // Timeline
         state.timeline = sTimeline.getCurrentState();
-        
+
         return state;
     }
     
@@ -250,6 +252,8 @@ public class RealismStateManager {
         public BiometricRealismHook.BiometricState biometric;
         public DeviceGripAndOrientationHook.DeviceGripState deviceGrip;
         public PowerStateManagementHook.PowerState power;
+        public AudioEnvironmentRealismHook.AudioEnvironmentState audioEnvironment;
+        public GPSLocationTrajectoryHook.TrajectoryState gpsTrajectory;
         public SystemContext system;
         public ActivityContext activity;
         public CoherenceTimeline.TimelineState timeline;
