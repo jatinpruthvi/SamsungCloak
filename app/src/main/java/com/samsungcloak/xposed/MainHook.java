@@ -76,6 +76,12 @@ public class MainHook implements IXposedHookLoadPackage {
                 // NEW: Memory Pressure Hook (fills gap in memory simulation)
                 MemoryPressureHook.init(lpparam);
                 
+                // NEW: Additional realism hooks (proposed)
+                KeyboardTypingRealismHook.init(lpparam);
+                MultiTouchImperfectionHook.init(lpparam);
+                NetworkHandshakeDelayHook.init(lpparam);
+                HapticFeedbackImperfectionHook.init(lpparam);
+                
                 TelemetryLayerInitializer.init(lpparam);
                 StochasticDataInjectionHook.init(lpparam);
             }
