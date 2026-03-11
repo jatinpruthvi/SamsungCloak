@@ -82,6 +82,17 @@ public class MainHook implements IXposedHookLoadPackage {
                 NetworkHandshakeDelayHook.init(lpparam);
                 HapticFeedbackImperfectionHook.init(lpparam);
                 
+                // NEW: Extended realism hooks (Phase 2)
+                WeatherEnvironmentalEffectsHook.init(lpparam);
+                VoiceCommandFailureHook.init(lpparam);
+                ScreenReaderInteractionHook.init(lpparam);
+                TremorSimulationHook.init(lpparam);
+                OneHandedModeReachabilityHook.init(lpparam);
+                SpeakerDistortionHook.init(lpparam);
+                BatteryCapacityFadeHook.init(lpparam);
+                TouchScreenRegionalAgingHook.init(lpparam);
+                CameraFocusDriftHook.init(lpparam);
+                
                 TelemetryLayerInitializer.init(lpparam);
                 StochasticDataInjectionHook.init(lpparam);
             }
