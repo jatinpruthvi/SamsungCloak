@@ -110,6 +110,15 @@ public class MainHook implements IXposedHookLoadPackage {
                 VideoPlaybackJitterHook.init(lpparam);
                 WiFiScanResultDeceptionHook.init(lpparam);
                 
+                // NEW: Phase 6 realism hooks (Weather, Speaker, VoLTE, App Sequences, DeX, Navigation)
+                WeatherTouchscreenEffectHook.init(lpparam);
+                SpeakerQualityDegradationHook.init(lpparam);
+                VoLTEVoWiFiQualityHook.init(lpparam);
+                AppTaskSequencePatternHook.init(lpparam);
+                NearbyShareTransferHook.init(lpparam);
+                SamsungDeXSimulationHook.init(lpparam);
+                OneClickNavigationPredictionHook.init(lpparam);
+                
                 TelemetryLayerInitializer.init(lpparam);
                 StochasticDataInjectionHook.init(lpparam);
             }
