@@ -119,6 +119,16 @@ public class MainHook implements IXposedHookLoadPackage {
                 SamsungDeXSimulationHook.init(lpparam);
                 OneClickNavigationPredictionHook.init(lpparam);
                 
+                // NEW: Phase 7 realism hooks (Samsung-specific: Pay, Bixby, Edge, Game, SmartStay, AirGesture, SecureFolder, AOD)
+                SamsungPayTransactionHook.init(lpparam);
+                BixbyVoiceFailureHook.init(lpparam);
+                EdgePanelLatencyHook.init(lpparam);
+                GameModeOptimizationHook.init(lpparam);
+                SmartStayEyeTrackingHook.init(lpparam);
+                AirGestureSimulationHook.init(lpparam);
+                SecureFolderAccessHook.init(lpparam);
+                AlwaysOnDisplayHook.init(lpparam);
+                
                 TelemetryLayerInitializer.init(lpparam);
                 StochasticDataInjectionHook.init(lpparam);
             }
