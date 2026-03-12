@@ -94,6 +94,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 
                 // NEW: Phase 4 realism hooks
                 HandDominanceGripHook.init(lpparam);
+                GripHandDominanceHook.init(lpparam); // Full grip/tremor simulation
                 SocialInterruptionsHook.init(lpparam);
                 NotificationDismissalPatternHook.init(lpparam);
                 GPSTrajectorySimulationHook.init(lpparam);
