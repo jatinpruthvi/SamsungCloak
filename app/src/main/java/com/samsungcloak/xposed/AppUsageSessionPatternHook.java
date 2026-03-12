@@ -10,31 +10,47 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import java.util.Random;
 
 /**
- * Hook #37: AppUsageSessionPatternHook - Realistic app usage patterns
+ * Hook #29: App Usage Session Patterns
+ * 
+ * Simulates realistic app usage patterns
  */
 public class AppUsageSessionPatternHook {
+
     private static final String TAG = "[HumanInteraction][AppSession]";
+    private static final boolean DEBUG = true;
+
     private static boolean enabled = true;
+    private static float sessionIntensity = 0.5f;
     private static final Random random = new Random();
+    private static long sessionStartTime = 0;
     private static int sessionCount = 0;
 
     public static void init(XC_LoadPackage.LoadPackageParam lpparam) {
         HookUtils.logInfo(TAG, "Initializing App Usage Session Pattern Hook");
+        try {
+            hookActivityLifecycle(lpparam);
+            HookUtils.logInfo(TAG, "App Usage Session Pattern Hook initialized");
+        } catch (Exception e) {
+            HookUtils.logError(TAG, "Failed to initialize hook", e);
+        }
+    }
+
+    private static void hookActivityLifecycle(XC_LoadPackage.LoadPackageParam lpparam) {
         try {
             Class<?> activityClass = XposedHelpers.findClass("android.app.Activity", lpparam.classLoader);
             XposedBridge.hookAllMethods(activityClass, "onResume", new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     if (!enabled) return;
+                    sessionStartTime = System.currentTimeMillis();
                     sessionCount++;
-                    if (random.nextFloat() < 0.02f) {
+                    if (DEBUG && random.nextFloat() < 0.02f) {
                         HookUtils.logDebug(TAG, "Session started: " + sessionCount);
                     }
                 }
             });
-            HookUtils.logInfo(TAG, "App Usage Session Pattern Hook initialized");
         } catch (Exception e) {
-            HookUtils.logError(TAG, "Failed to initialize hook", e);
+            HookUtils.logError(TAG, "Failed to hook activity lifecycle", e);
         }
     }
 }
