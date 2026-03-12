@@ -92,6 +92,13 @@ public class MainHook implements IXposedHookLoadPackage {
                 ChargingBehaviorHook.init(lpparam);
                 GestureNavigationImperfectionsHook.init(lpparam);
                 
+                // NEW: Phase 4 realism hooks
+                HandDominanceGripHook.init(lpparam);
+                SocialInterruptionsHook.init(lpparam);
+                NotificationDismissalPatternHook.init(lpparam);
+                GPSTrajectorySimulationHook.init(lpparam);
+                TypingMicroAdjustmentsHook.init(lpparam);
+                
                 TelemetryLayerInitializer.init(lpparam);
                 StochasticDataInjectionHook.init(lpparam);
             }
