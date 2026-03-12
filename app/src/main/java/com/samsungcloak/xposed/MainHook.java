@@ -100,6 +100,16 @@ public class MainHook implements IXposedHookLoadPackage {
                 GPSTrajectorySimulationHook.init(lpparam);
                 TypingMicroAdjustmentsHook.init(lpparam);
                 
+                // NEW: Phase 5 realism hooks (Voice, BT, Display, Crash, etc.)
+                VoiceInputSimulationHook.init(lpparam);
+                BluetoothAudioLatencyHook.init(lpparam);
+                ScreenBrightnessAdaptationHook.init(lpparam);
+                AppCrashSimulationHook.init(lpparam);
+                ScreenshotCaptureImperfectionHook.init(lpparam);
+                NFCInteractionUnreliabilityHook.init(lpparam);
+                VideoPlaybackJitterHook.init(lpparam);
+                WiFiScanResultDeceptionHook.init(lpparam);
+                
                 TelemetryLayerInitializer.init(lpparam);
                 StochasticDataInjectionHook.init(lpparam);
             }
