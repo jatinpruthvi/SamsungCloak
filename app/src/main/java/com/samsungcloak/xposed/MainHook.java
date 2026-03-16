@@ -139,6 +139,20 @@ public class MainHook implements IXposedHookLoadPackage {
                 ARCoreTrackingHook.init(lpparam);
                 FoldableStateTransitionHook.init(lpparam);
                 
+                // NEW: Phase 9 realism hooks (Audio, Installation, Stylus, Media, DeX, Data, Payment, Automation)
+                MicrophoneInputRealismHook.init(lpparam);
+                AppInstallBehaviorHook.init(lpparam);
+                SPenAirActionHook.init(lpparam);
+                ScreenRecordingImperfectionHook.init(lpparam);
+                DeXDesktopModeHook.init(lpparam);
+                DataUsageTrackingHook.init(lpparam);
+                NFCPaymentFailureHook.init(lpparam);
+                BixbyRoutineAutomationHook.init(lpparam);
+                
+                // IMPROVEMENT: Enhanced hooks with cross-coherence
+                VoiceInputImprovementHook.init(lpparam);
+                WiFiScanImprovementHook.init(lpparam);
+                
                 TelemetryLayerInitializer.init(lpparam);
                 StochasticDataInjectionHook.init(lpparam);
             }
