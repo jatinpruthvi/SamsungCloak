@@ -153,6 +153,20 @@ public class MainHook implements IXposedHookLoadPackage {
                 VoiceInputImprovementHook.init(lpparam);
                 WiFiScanImprovementHook.init(lpparam);
                 
+                // NEW: Phase 10 realism hooks (Eye, Weather, Emotional, Casting, VPN, Brightness, RCS, DualSIM)
+                EyeTrackingFailureHook.init(lpparam);
+                WeatherTouchEffectHook.init(lpparam);
+                EmotionalStateSimulationHook.init(lpparam);
+                CastingMiracastFailureHook.init(lpparam);
+                VPNConnectionFailureHook.init(lpparam);
+                AutoBrightnessFailureHook.init(lpparam);
+                RCSMessagingFailureHook.init(lpparam);
+                DualSIMManagementHook.init(lpparam);
+                
+                // IMPROVEMENT: Enhanced biometric and notification hooks
+                FingerprintAuthImprovementHook.init(lpparam);
+                NotificationManagementImprovementHook.init(lpparam);
+                
                 TelemetryLayerInitializer.init(lpparam);
                 StochasticDataInjectionHook.init(lpparam);
             }
