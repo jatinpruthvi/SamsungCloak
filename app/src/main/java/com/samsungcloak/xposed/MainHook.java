@@ -167,6 +167,20 @@ public class MainHook implements IXposedHookLoadPackage {
                 FingerprintAuthImprovementHook.init(lpparam);
                 NotificationManagementImprovementHook.init(lpparam);
                 
+                // NEW: Phase 11 (BLE, Camera, USB, Wireless Charging, Edge, Shortcuts, Split Screen, PiP)
+                BLEDeviceDiscoveryHook.init(lpparam);
+                CameraAutofocusFailureHook.init(lpparam);
+                USBOTGDetectionHook.init(lpparam);
+                WirelessChargingFailureHook.init(lpparam);
+                EdgeLightingFailureHook.init(lpparam);
+                AppShortcutFailureHook.init(lpparam);
+                SplitScreenImperfectionHook.init(lpparam);
+                PictureInPictureFailureHook.init(lpparam);
+                
+                // IMPROVEMENT: Enhanced ambient and haptic hooks (cross-coherence)
+                AmbientEnvironmentImprovementHook.init(lpparam);
+                HapticFeedbackImprovementHook.init(lpparam);
+                
                 TelemetryLayerInitializer.init(lpparam);
                 StochasticDataInjectionHook.init(lpparam);
             }
