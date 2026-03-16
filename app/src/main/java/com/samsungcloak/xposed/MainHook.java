@@ -129,6 +129,16 @@ public class MainHook implements IXposedHookLoadPackage {
                 SecureFolderAccessHook.init(lpparam);
                 AlwaysOnDisplayHook.init(lpparam);
                 
+                // NEW: Phase 8 realism hooks (Modern Connectivity & Advanced Hardware)
+                WiFi6ELegacyHook.init(lpparam);
+                UWBLocalizationHook.init(lpparam);
+                eSIMActivationHook.init(lpparam);
+                MatterSmartHomeHook.init(lpparam);
+                SatelliteConnectivityHook.init(lpparam);
+                VehicleAndroidAutoHook.init(lpparam);
+                ARCoreTrackingHook.init(lpparam);
+                FoldableStateTransitionHook.init(lpparam);
+                
                 TelemetryLayerInitializer.init(lpparam);
                 StochasticDataInjectionHook.init(lpparam);
             }
