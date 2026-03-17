@@ -44,7 +44,7 @@ public class ConfigurationManager {
         DEFAULT_INTENSITIES.put("hook_11", 0.5f);
         DEFAULT_INTENSITIES.put("hook_12", 0.5f);
         
-        // New hooks 13-20
+        // New hooks 13-20 (original definitions)
         DEFAULT_INTENSITIES.put("hook_13", 0.5f); // Biometric Authentication Realism
         DEFAULT_INTENSITIES.put("hook_14", 0.5f); // Social Interruption Simulation
         DEFAULT_INTENSITIES.put("hook_15", 0.5f); // Hardware Aging & Wear Simulation
@@ -53,6 +53,21 @@ public class ConfigurationManager {
         DEFAULT_INTENSITIES.put("hook_18", 0.5f); // Haptic Feedback Realism
         DEFAULT_INTENSITIES.put("hook_19", 0.5f); // Audio Environment & Microphone Realism
         DEFAULT_INTENSITIES.put("hook_20", 0.5f); // App Standby & Doze Mode Realism
+        
+        // New hooks 13-20 (extended definitions)
+        DEFAULT_INTENSITIES.put("hook_13_realism", 0.5f); // GPS Trajectory & Location Context
+        DEFAULT_INTENSITIES.put("hook_14_realism", 0.5f); // Accessibility Scenario Simulation
+        DEFAULT_INTENSITIES.put("hook_15_realism", 0.5f); // Weather & Environmental Sensor Effects
+        DEFAULT_INTENSITIES.put("hook_16_realism", 0.5f); // Notification Dismissal & Attention Patterns
+        DEFAULT_INTENSITIES.put("hook_17_realism", 0.5f); // Device Orientation & Grip Dynamics
+        DEFAULT_INTENSITIES.put("hook_18_realism", 0.5f); // Emotional State Interaction Patterns
+        DEFAULT_INTENSITIES.put("hook_19_realism", 0.5f); // App Session & Task Switching Patterns
+        DEFAULT_INTENSITIES.put("hook_20_realism", 0.5f); // Voice Command & Speech Recognition Realism
+        
+        // Improved existing hooks
+        DEFAULT_INTENSITIES.put("hook_03_realism", 0.5f); // Inter-App Navigation (Improved)
+        DEFAULT_INTENSITIES.put("hook_07_realism", 0.5f); // Battery Thermal & Performance (Improved)
+        DEFAULT_INTENSITIES.put("hook_08_realism", 0.5f); // Network Quality & Handover (Improved)
     }
 
     private final SharedPreferences prefs;

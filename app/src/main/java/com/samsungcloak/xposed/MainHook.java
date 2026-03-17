@@ -206,6 +206,40 @@ public class MainHook implements IXposedHookLoadPackage {
                 // Hook 20: App Standby & Doze Mode Realism
                 Hook20AppStandbyDoze.init(lpparam);
                 
+                // NEW: Hook 13-20 Realism Classes (Extended Features)
+                // Hook 13: GPS Trajectory & Location Context
+                Hook13Realism.init(lpparam);
+                
+                // Hook 14: Accessibility Scenario Simulation
+                Hook14Realism.init(lpparam);
+                
+                // Hook 15: Weather & Environmental Sensor Effects
+                Hook15Realism.init(lpparam);
+                
+                // Hook 16: Notification Dismissal & Attention Patterns
+                Hook16Realism.init(lpparam);
+                
+                // Hook 17: Device Orientation & Grip Dynamics
+                Hook17Realism.init(lpparam);
+                
+                // Hook 18: Emotional State Interaction Patterns
+                Hook18Realism.init(lpparam);
+                
+                // Hook 19: App Session & Task Switching Patterns
+                Hook19Realism.init(lpparam);
+                
+                // Hook 20: Voice Command & Speech Recognition Realism
+                Hook20Realism.init(lpparam);
+                
+                // IMPROVED: Hook 03 - Inter-App Navigation Realism (Enhanced)
+                Hook03Realism.init(lpparam);
+                
+                // IMPROVED: Hook 07 - Battery Thermal & Performance Realism (Enhanced)
+                Hook07Realism.init(lpparam);
+                
+                // IMPROVED: Hook 08 - Network Quality & Handover Realism (Enhanced)
+                Hook08Realism.init(lpparam);
+                
                 // Initialize Reality Coordinator for cross-hook coordination
                 RealityCoordinator.init();
                 
