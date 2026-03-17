@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+  SamsungCloak Xposed Module Configuration
+  
+  Configuration for all 20 realism hooks targeting Samsung Galaxy A12 (SM-A125U)
+  Android 10/11 compatibility
+  
+  Hooks 1-12: Original framework
+  Hooks 13-20: New realism hooks (this file)
+-->
+<hooks_configuration>
+    
+    <!-- Global Settings -->
+    <global_settings>
+        <setting name="global_coordination_enabled" type="boolean" default="true" />
+        <setting name="context_awareness_enabled" type="boolean" default="true" />
+        <setting name="temporal_alignment_enabled" type="boolean" default="true" />
+    </global_settings>
+
+    <!-- Hook 13: Biometric Authentication Realism -->
+    <hook id="hook_13" name="BiometricRealism">
+        <setting name="enabled" type="boolean" default="true" />
+        <setting name="intensity" type="float" default="0.5" min="0.0" max="1.0" />
+        
+        <!-- Fingerprint settings -->
+        <setting name="fingerprint_enabled" type="boolean" default="true" />
+        <setting name="partial_print_failure_rate" type="float" default="0.15" />
+        <setting name="wet_finger_failure_rate" type="float" default="0.20" />
+        
+        <!-- Face recognition settings -->
+        <setting name="face_enabled" type="boolean" default="true" />
+        <setting name="lighting_failure_rate" type="float" default="0.12" />
+        
+        <!-- Confidence and timeout -->
+        <setting name="confidence_degradation" type="float" default="0.15" />
+        <setting name="timeout_enabled" type="boolean" default="true" />
+        <setting name="base_timeout_ms" type="integer" default="30000" />
+        <setting name="timeout_variance_ms" type="integer" default="5000" />
+    </hook>
+
+    <!-- Hook 14: Social Interruption Simulation -->
+    <hook id="hook_14" name="SocialInterruption">
+        <setting name="enabled" type="boolean" default="true" />
+        <setting name="intensity" type="float" default="0.5" min="0.0" max="1.0" />
+        
+        <!-- Call interruption -->
+        <setting name="call_interruption_enabled" type="boolean" default="true" />
+        <setting name="high_engagement_call_rate" type="float" default="0.08" />
+        <setting name="medium_engagement_call_rate" type="float" default="0.15" />
+        <setting name="low_engagement_call_rate" type="float" default="0.25" />
+        
+        <!-- SMS interruption -->
+        <setting name="sms_interruption_enabled" type="boolean" default="true" />
+        <setting name="high_engagement_sms_rate" type="float" default="0.12" />
+        <setting name="medium_engagement_sms_rate" type="float" default="0.20" />
+        <setting name="low_engagement_sms_rate" type="float" default="0.35" />
+        
+        <!-- Notification burst -->
+        <setting name="burst_enabled" type="boolean" default="true" />
+        <setting name="burst_probability" type="float" default="0.05" />
+        <setting name="burst_min_notifications" type="integer" default="3" />
+        <setting name="burst_max_notifications" type="integer" default="8" />
+        
+        <!-- Dismissal patterns -->
+        <setting name="dismissal_enabled" type="boolean" default="true" />
+        <setting name="swipe_away_probability" type="float" default="0.80" />
+        <setting name="partial_view_probability" type="float" default="0.15" />
+        <setting name="multi_step_probability" type="float" default="0.05" />
+    </hook>
+
+    <!-- Hook 15: Hardware Aging & Wear Simulation -->
+    <hook id="hook_15" name="HardwareAging">
+        <setting name="enabled" type="boolean" default="true" />
+        <setting name="intensity" type="float" default="0.5" min="0.0" max="1.0" />
+        
+        <!-- Device age simulation -->
+        <setting name="device_age_months" type="integer" default="6" />
+        
+        <!-- Screen wear -->
+        <setting name="screen_wear_enabled" type="boolean" default="true" />
+        <setting name="screen_sensitivity_loss" type="float" default="0.05" />
+        <setting name="screen_latency_increase" type="float" default="0.03" />
+        <setting name="ghost_touch_probability" type="float" default="0.02" />
+        
+        <!-- Battery aging -->
+        <setting name="battery_aging_enabled" type="boolean" default="true" />
+        <setting name="battery_capacity_fade" type="float" default="0.008" />
+        <setting name="voltage_sag_factor" type="float" default="0.02" />
+        <setting name="early_shutdown_threshold" type="float" default="0.15" />
+        
+        <!-- Camera aging -->
+        <setting name="camera_aging_enabled" type="boolean" default="true" />
+        <setting name="focus_latency_increase" type="float" default="0.04" />
+        <setting name="color_drift_factor" type="float" default="0.02" />
+        
+        <!-- Speaker aging -->
+        <setting name="speaker_aging_enabled" type="boolean" default="true" />
+        <setting name="frequency_degradation" type="float" default="0.01" />
+        <setting name="volume_reduction" type="float" default="0.015" />
+    </hook>
+
+    <!-- Hook 16: Multi-Device Interaction Realism -->
+    <hook id="hook_16" name="MultiDeviceInteraction">
+        <setting name="enabled" type="boolean" default="true" />
+        <setting name="intensity" type="float" default="0.5" min="0.0" max="1.0" />
+        
+        <!-- Bluetooth -->
+        <setting name="bluetooth_enabled" type="boolean" default="true" />
+        <setting name="connection_delay_probability" type="float" default="0.15" />
+        <setting name="disconnection_probability" type="float" default="0.08" />
+        <setting name="audio_dropout_probability" type="float" default="0.12" />
+        <setting name="connection_delay_base_ms" type="integer" default="500" />
+        
+        <!-- Nearby Share -->
+        <setting name="nearby_share_enabled" type="boolean" default="true" />
+        <setting name="detection_latency_ms" type="integer" default="2000" />
+        <setting name="transfer_success_base_rate" type="float" default="0.85" />
+        <setting name="distance_based_failure_rate" type="float" default="0.20" />
+        
+        <!-- NFC -->
+        <setting name="nfc_enabled" type="boolean" default="true" />
+        <setting name="read_success_probability" type="float" default="0.90" />
+        <setting name="hold_time_variance" type="float" default="0.30" />
+        <setting name="multi_tag_conflict_probability" type="float" default="0.15" />
+        
+        <!-- Audio routing -->
+        <setting name="audio_routing_enabled" type="boolean" default="true" />
+        <setting name="handover_delay_probability" type="float" default="0.10" />
+        <setting name="volume_mismatch_probability" type="float" default="0.08" />
+    </hook>
+
+    <!-- Hook 17: Time-of-Day Usage Pattern Simulation -->
+    <hook id="hook_17" name="TimeOfDayUsage">
+        <setting name="enabled" type="boolean" default="true" />
+        <setting name="intensity" type="float" default="0.5" min="0.0" max="1.0" />
+        
+        <!-- Morning (6-9am) -->
+        <setting name="morning_burst_enabled" type="boolean" default="true" />
+        <setting name="morning_burst_probability" type="float" default="0.25" />
+        <setting name="morning_input_speed" type="float" default="1.2" />
+        <setting name="morning_accuracy" type="float" default="1.1" />
+        
+        <!-- Work hours (9am-5pm) -->
+        <setting name="work_hours_enabled" type="boolean" default="true" />
+        <setting name="work_burst_probability" type="float" default="0.15" />
+        <setting name="work_burst_min_apps" type="integer" default="3" />
+        <setting name="work_burst_max_apps" type="integer" default="8" />
+        
+        <!-- Evening (5-10pm) -->
+        <setting name="evening_burst_enabled" type="boolean" default="true" />
+        <setting name="evening_burst_probability" type="float" default="0.30" />
+        <setting name="evening_input_speed" type="float" default="0.85" />
+        <setting name="evening_accuracy" type="float" default="0.90" />
+        
+        <!-- Night (10pm-6am) -->
+        <setting name="night_mode_enabled" type="boolean" default="true" />
+        <setting name="night_burst_probability" type="float" default="0.08" />
+        <setting name="night_input_speed" type="float" default="0.7" />
+        <setting name="night_accuracy" type="float" default="0.75" />
+        <setting name="ghost_touch_probability" type="float" default="0.15" />
+        
+        <!-- Idle -->
+        <setting name="idle_enabled" type="boolean" default="true" />
+        <setting name="idle_probability" type="float" default="0.20" />
+        <setting name="idle_min_duration_ms" type="integer" default="60000" />
+        <setting name="idle_max_duration_ms" type="integer" default="300000" />
+    </hook>
+
+    <!-- Hook 18: Haptic Feedback Realism -->
+    <hook id="hook_18" name="HapticFeedbackRealism">
+        <setting name="enabled" type="boolean" default="true" />
+        <setting name="intensity" type="float" default="0.5" min="0.0" max="1.0" />
+        
+        <!-- Motor physics -->
+        <setting name="motor_physics_enabled" type="boolean" default="true" />
+        <setting name="ramp_up_latency_ms" type="float" default="5.0" />
+        <setting name="ramp_down_latency_ms" type="float" default="8.0" />
+        <setting name="inertia_factor" type="float" default="0.15" />
+        <setting name="resonance_decay_rate" type="float" default="0.20" />
+        
+        <!-- Intensity modulation -->
+        <setting name="intensity_modulation_enabled" type="boolean" default="true" />
+        <setting name="battery_level_threshold" type="float" default="0.20" />
+        <setting name="low_battery_drain" type="float" default="0.30" />
+        <setting name="thermal_throttle_effect" type="float" default="0.25" />
+        
+        <!-- Wear simulation -->
+        <setting name="wear_simulation_enabled" type="boolean" default="true" />
+        <setting name="high_frequency_loss" type="float" default="0.10" />
+        <setting name="amplitude_drift" type="float" default="0.05" />
+        <setting name="rattle_probability" type="float" default="0.08" />
+        
+        <!-- Context-aware -->
+        <setting name="context_aware_enabled" type="boolean" default="true" />
+        <setting name="notification_variation" type="float" default="0.20" />
+        <setting name="keyboard_miss_probability" type="float" default="0.12" />
+        <setting name="gesture_scale_factor" type="float" default="0.15" />
+    </hook>
+
+    <!-- Hook 19: Audio Environment & Microphone Realism -->
+    <hook id="hook_19" name="AudioEnvironment">
+        <setting name="enabled" type="boolean" default="true" />
+        <setting name="intensity" type="float" default="0.5" min="0.0" max="1.0" />
+        
+        <!-- Environmental noise -->
+        <setting name="environmental_noise_enabled" type="boolean" default="true" />
+        <setting name="quiet_room_noise_level" type="float" default="-50.0" />
+        <setting name="office_noise_level" type="float" default="-35.0" />
+        <setting name="restaurant_noise_level" type="float" default="-25.0" />
+        <setting name="outdoors_noise_level" type="float" default="-20.0" />
+        
+        <!-- Microphone -->
+        <setting name="microphone_enabled" type="boolean" default="true" />
+        <setting name="agc_latency_ms" type="float" default="50.0" />
+        <setting name="clipping_probability" type="float" default="0.08" />
+        <setting name="proximity_effect_factor" type="float" default="0.15" />
+        
+        <!-- Speaker -->
+        <setting name="speaker_enabled" type="boolean" default="true" />
+        <setting name="volume_auto_adjust_probability" type="float" default="0.15" />
+        <setting name="acoustic_damping_factor" type="float" default="0.12" />
+        
+        <!-- Voice command -->
+        <setting name="voice_command_enabled" type="boolean" default="true" />
+        <setting name="wake_word_detection_rate" type="float" default="0.85" />
+        <setting name="command_accuracy_base" type="float" default="0.90" />
+        <setting name="retry_probability" type="float" default="0.20" />
+    </hook>
+
+    <!-- Hook 20: App Standby & Doze Mode Realism -->
+    <hook id="hook_20" name="AppStandbyDoze">
+        <setting name="enabled" type="boolean" default="true" />
+        <setting name="intensity" type="float" default="0.5" min="0.0" max="1.0" />
+        
+        <!-- Doze mode -->
+        <setting name="doze_enabled" type="boolean" default="true" />
+        <setting name="light_doze_probability" type="float" default="0.70" />
+        <setting name="deep_doze_probability" type="float" default="0.50" />
+        <setting name="maintenance_window_ms" type="integer" default="600000" />
+        <setting name="incomplete_doze_entry_probability" type="float" default="0.15" />
+        <setting name="premature_wake_up_probability" type="float" default="0.10" />
+        
+        <!-- Wake-up triggers -->
+        <setting name="wake_up_triggers_enabled" type="boolean" default="true" />
+        <setting name="motion_wake_up_probability" type="float" default="0.20" />
+        <setting name="alarm_wake_up_probability" type="float" default="0.80" />
+        <setting name="notification_wake_up_probability" type="float" default="0.60" />
+        
+        <!-- App standby -->
+        <setting name="standby_buckets_enabled" type="boolean" default="true" />
+        
+        <!-- Adaptive battery -->
+        <setting name="adaptive_battery_enabled" type="boolean" default="true" />
+        <setting name="throttling_probability" type="float" default="0.25" />
+        <setting name="job_deferral_probability" type="float" default="0.30" />
+    </hook>
+
+</hooks_configuration>

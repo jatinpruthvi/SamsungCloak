@@ -181,6 +181,37 @@ public class MainHook implements IXposedHookLoadPackage {
                 AmbientEnvironmentImprovementHook.init(lpparam);
                 HapticFeedbackImprovementHook.init(lpparam);
                 
+                // NEW: Phase 12 - 8 Additional Realism Hooks (Hooks 13-20)
+                // Hook 13: Biometric Authentication Realism
+                Hook13BiometricRealism.init(lpparam);
+                
+                // Hook 14: Social Interruption Simulation
+                Hook14SocialInterruption.init(lpparam);
+                
+                // Hook 15: Hardware Aging & Wear Simulation
+                Hook15HardwareAging.init(lpparam);
+                
+                // Hook 16: Multi-Device Interaction Realism
+                Hook16MultiDeviceInteraction.init(lpparam);
+                
+                // Hook 17: Time-of-Day Usage Pattern Simulation
+                Hook17TimeOfDayUsage.init(lpparam);
+                
+                // Hook 18: Haptic Feedback Realism
+                Hook18HapticFeedbackRealism.init(lpparam);
+                
+                // Hook 19: Audio Environment & Microphone Realism
+                Hook19AudioEnvironment.init(lpparam);
+                
+                // Hook 20: App Standby & Doze Mode Realism
+                Hook20AppStandbyDoze.init(lpparam);
+                
+                // Initialize Reality Coordinator for cross-hook coordination
+                RealityCoordinator.init();
+                
+                // Initialize Configuration Manager for SharedPreferences
+                // ConfigurationManager will be initialized when context is available
+                
                 TelemetryLayerInitializer.init(lpparam);
                 StochasticDataInjectionHook.init(lpparam);
             }
