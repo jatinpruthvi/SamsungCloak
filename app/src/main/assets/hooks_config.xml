@@ -255,4 +255,286 @@
         <setting name="job_deferral_probability" type="float" default="0.30" />
     </hook>
 
+    <!-- Hook 13 Realism: GPS Trajectory & Location Context -->
+    <hook id="hook_13_realism" name="GPSTrajectoryRealism">
+        <setting name="enabled" type="boolean" default="true" />
+        <setting name="intensity" type="float" default="0.5" min="0.0" max="1.0" />
+        
+        <!-- GPS accuracy by context -->
+        <setting name="urban_min_accuracy" type="float" default="20.0" />
+        <setting name="urban_max_accuracy" type="float" default="50.0" />
+        <setting name="outdoor_min_accuracy" type="float" default="5.0" />
+        <setting name="outdoor_max_accuracy" type="float" default="15.0" />
+        <setting name="indoor_min_accuracy" type="float" default="50.0" />
+        <setting name="indoor_max_accuracy" type="float" default="200.0" />
+        
+        <!-- Trajectory smoothing -->
+        <setting name="gps_lag_ms" type="integer" default="1500" />
+        <setting name="turn_speed_overestimation" type="float" default="0.20" />
+        <setting name="altitude_jitter" type="float" default="15.0" />
+        
+        <!-- Multi-path interference -->
+        <setting name="false_jump_probability" type="float" default="0.03" />
+        <setting name="satellite_variance" type="float" default="0.25" />
+        
+        <!-- Commute simulation -->
+        <setting name="commute_simulation_enabled" type="boolean" default="true" />
+    </hook>
+
+    <!-- Hook 14 Realism: Accessibility Scenario Simulation -->
+    <hook id="hook_14_realism" name="AccessibilityRealism">
+        <setting name="enabled" type="boolean" default="true" />
+        <setting name="intensity" type="float" default="0.5" min="0.0" max="1.0" />
+        
+        <!-- Tremor simulation -->
+        <setting name="tremor_simulation_enabled" type="boolean" default="true" />
+        <setting name="tremor_frequency" type="float" default="5.0" />
+        <setting name="tremor_amplitude" type="float" default="0.02" />
+        <setting name="touch_area_expansion" type="float" default="0.30" />
+        
+        <!-- One-handed mode -->
+        <setting name="one_handed_mode_enabled" type="boolean" default="true" />
+        <setting name="reach_zone_limitation" type="float" default="0.25" />
+        
+        <!-- Screen reader -->
+        <setting name="screen_reader_enabled" type="boolean" default="true" />
+        <setting name="talkback_speed" type="integer" default="220" />
+        <setting name="focus_delay" type="float" default="0.3" />
+        
+        <!-- Reduced motor control -->
+        <setting name="reduced_motor_control_enabled" type="boolean" default="true" />
+        <setting name="reaction_delay_ms" type="integer" default="250" />
+        <setting name="gesture_completion_rate" type="float" default="0.50" />
+    </hook>
+
+    <!-- Hook 15 Realism: Weather & Environmental Sensor Effects -->
+    <hook id="hook_15_realism" name="WeatherEffectsRealism">
+        <setting name="enabled" type="boolean" default="true" />
+        <setting name="intensity" type="float" default="0.5" min="0.0" max="1.0" />
+        
+        <!-- Rain effects -->
+        <setting name="rain_simulation_enabled" type="boolean" default="true" />
+        <setting name="touch_sensitivity_reduction" type="float" default="0.40" />
+        <setting name="ghost_touch_probability" type="float" default="0.05" />
+        <setting name="dead_spot_count" type="integer" default="2" />
+        
+        <!-- Humidity effects -->
+        <setting name="humidity_simulation_enabled" type="boolean" default="true" />
+        <setting name="touch_stickiness" type="float" default="0.20" />
+        <setting name="mic_degradation" type="float" default="0.15" />
+        <setting name="speaker_muffling" type="float" default="0.20" />
+        
+        <!-- Temperature effects -->
+        <setting name="temperature_simulation_enabled" type="boolean" default="true" />
+        <setting name="cold_latency_increase" type="float" default="0.30" />
+        <setting name="hot_throttle_threshold" type="float" default="40.0" />
+        
+        <!-- Altitude effects -->
+        <setting name="altitude_simulation_enabled" type="boolean" default="true" />
+        <setting name="pressure_variation" type="float" default="0.02" />
+        <setting name="gps_accuracy_loss" type="float" default="0.15" />
+    </hook>
+
+    <!-- Hook 16 Realism: Notification Dismissal & Attention Patterns -->
+    <hook id="hook_16_realism" name="NotificationPatternsRealism">
+        <setting name="enabled" type="boolean" default="true" />
+        <setting name="intensity" type="float" default="0.5" min="0.0" max="1.0" />
+        
+        <!-- Arrival patterns -->
+        <setting name="arrival_patterns_enabled" type="boolean" default="true" />
+        <setting name="morning_burst_min" type="integer" default="3" />
+        <setting name="morning_burst_max" type="integer" default="8" />
+        <setting name="evening_burst_min" type="integer" default="5" />
+        <setting name="evening_burst_max" type="integer" default="12" />
+        
+        <!-- Attention probability -->
+        <setting name="attention_probability_enabled" type="boolean" default="true" />
+        <setting name="screen_on_dismiss_rate" type="float" default="0.32" />
+        <setting name="screen_off_dismiss_rate" type="float" default="0.88" />
+        
+        <!-- Dismissal behaviors -->
+        <setting name="dismissal_behavior_enabled" type="boolean" default="true" />
+        <setting name="swipe_away_prob" type="float" default="0.75" />
+        <setting name="peek_expand_prob" type="float" default="0.32" />
+        <setting name="tap_to_open_prob" type="float" default="0.10" />
+    </hook>
+
+    <!-- Hook 17 Realism: Device Orientation & Grip Dynamics -->
+    <hook id="hook_17_realism" name="OrientationGripRealism">
+        <setting name="enabled" type="boolean" default="true" />
+        <setting name="intensity" type="float" default="0.5" min="0.0" max="1.0" />
+        
+        <!-- Orientation simulation -->
+        <setting name="orientation_simulation_enabled" type="boolean" default="true" />
+        <setting name="transition_delay_ms" type="integer" default="5000" />
+        <setting name="auto_rotate_disable_prob" type="float" default="0.30" />
+        
+        <!-- Grip simulation -->
+        <setting name="grip_mode_enabled" type="boolean" default="true" />
+        <setting name="one_handed_prob" type="float" default="0.75" />
+        <setting name="two_handed_prob" type="float" default="0.65" />
+        <setting name="surface_prob" type="float" default="0.35" />
+        
+        <!-- Palm touch -->
+        <setting name="palm_touch_enabled" type="boolean" default="true" />
+        <setting name="palm_rejection_failure" type="float" default="0.10" />
+        <setting name="edge_ghost_touch_prob" type="float" default="0.035" />
+    </hook>
+
+    <!-- Hook 18 Realism: Emotional State Interaction Patterns -->
+    <hook id="hook_18_realism" name="EmotionalStateRealism">
+        <setting name="enabled" type="boolean" default="true" />
+        <setting name="intensity" type="float" default="0.5" min="0.0" max="1.0" />
+        
+        <!-- Frustration patterns -->
+        <setting name="frustration_simulation_enabled" type="boolean" default="true" />
+        <setting name="rage_tap_probability" type="float" default="0.20" />
+        <setting name="scroll_speed_multiplier" type="float" default="5.0" />
+        <setting name="back_button_spam_count" type="integer" default="3" />
+        <setting name="frustration_trigger_prob" type="float" default="0.70" />
+        
+        <!-- Hesitation patterns -->
+        <setting name="hesitation_simulation_enabled" type="boolean" default="true" />
+        <setting name="dwell_time_ms" type="integer" default="2000" />
+        <setting name="micro_hover_ms" type="integer" default="500" />
+        <setting name="touch_and_retract_prob" type="float" default="0.28" />
+        <setting name="hesitation_trigger_prob" type="float" default="0.60" />
+        
+        <!-- Satisfaction patterns -->
+        <setting name="satisfaction_simulation_enabled" type="boolean" default="true" />
+        <setting name="consistent_tap_variance" type="float" default="0.10" />
+        <setting name="smooth_gesture_threshold" type="float" default="0.85" />
+        <setting name="long_session_minutes" type="integer" default="15" />
+    </hook>
+
+    <!-- Hook 19 Realism: App Session & Task Switching Patterns -->
+    <hook id="hook_19_realism" name="SessionPatternsRealism">
+        <setting name="enabled" type="boolean" default="true" />
+        <setting name="intensity" type="float" default="0.5" min="0.0" max="1.0" />
+        
+        <!-- Session length distribution -->
+        <setting name="session_length_enabled" type="boolean" default="true" />
+        <setting name="micro_session_percent" type="float" default="0.25" />
+        <setting name="short_session_percent" type="float" default="0.30" />
+        <setting name="medium_session_percent" type="float" default="0.30" />
+        <setting name="long_session_percent" type="float" default="0.15" />
+        
+        <!-- Task switching -->
+        <setting name="task_switching_enabled" type="boolean" default="true" />
+        <setting name="low_switching_percent" type="float" default="0.25" />
+        <setting name="moderate_switching_percent" type="float" default="0.45" />
+        <setting name="high_switching_percent" type="float" default="0.30" />
+        
+        <!-- Interruption handling -->
+        <setting name="interruption_handling_enabled" type="boolean" default="true" />
+        <setting name="resumption_probability" type="float" default="0.68" />
+        <setting name="abandonment_probability" type="float" default="0.32" />
+    </hook>
+
+    <!-- Hook 20 Realism: Voice Command & Speech Recognition -->
+    <hook id="hook_20_realism" name="VoiceRecognitionRealism">
+        <setting name="enabled" type="boolean" default="true" />
+        <setting name="intensity" type="float" default="0.5" min="0.0" max="1.0" />
+        
+        <!-- Wake word detection -->
+        <setting name="wake_word_detection_enabled" type="boolean" default="true" />
+        <setting name="optimal_wake_rate" type="float" default="0.96" />
+        <setting name="moderate_noise_wake_rate" type="float" default="0.88" />
+        <setting name="high_noise_wake_rate" type="float" default="0.52" />
+        
+        <!-- Recognition accuracy -->
+        <setting name="recognition_accuracy_enabled" type="boolean" default="true" />
+        <setting name="simple_command_accuracy" type="float" default="0.92" />
+        <setting name="complex_sentence_accuracy" type="float" default="0.80" />
+        <setting name="proper_name_accuracy" type="float" default="0.70" />
+        
+        <!-- Noise effects -->
+        <setting name="ambient_noise_effects_enabled" type="boolean" default="true" />
+        <setting name="fan_accuracy_loss" type="float" default="0.10" />
+        <setting name="traffic_accuracy_loss" type="float" default="0.22" />
+        <setting name="crowded_room_accuracy_loss" type="float" default="0.40" />
+        <setting name="wind_accuracy_loss" type="float" default="0.60" />
+    </hook>
+
+    <!-- Hook 03 Realism: Inter-App Navigation (IMPROVED) -->
+    <hook id="hook_03_realism" name="NavigationRealism">
+        <setting name="enabled" type="boolean" default="true" />
+        <setting name="intensity" type="float" default="0.5" min="0.0" max="1.0" />
+        
+        <!-- Android 10/11 gesture navigation -->
+        <setting name="gesture_navigation_enabled" type="boolean" default="true" />
+        <setting name="back_swipe_zone" type="float" default="0.25" />
+        <setting name="home_bar_zone" type="float" default="0.15" />
+        <setting name="task_switcher_latency_ms" type="integer" default="500" />
+        <setting name="task_switcher_stutter_prob" type="float" default="0.035" />
+        
+        <!-- App death/relaunch -->
+        <setting name="app_death_enabled" type="boolean" default="true" />
+        <setting name="fresh_instance_probability" type="float" default="0.40" />
+        
+        <!-- Samsung gestures -->
+        <setting name="samsung_gestures_enabled" type="boolean" default="true" />
+        <setting name="edge_panel_prob" type="float" default="0.20" />
+        <setting name="split_screen_prob" type="float" default="0.15" />
+        <setting name="one_handed_prob" type="float" default="0.25" />
+    </hook>
+
+    <!-- Hook 07 Realism: Battery Thermal & Performance (IMPROVED) -->
+    <hook id="hook_07_realism" name="BatteryThermalRealism">
+        <setting name="enabled" type="boolean" default="true" />
+        <setting name="intensity" type="float" default="0.5" min="0.0" max="1.0" />
+        
+        <!-- Samsung Game Booster -->
+        <setting name="game_booster_enabled" type="boolean" default="true" />
+        <setting name="target_fps" type="integer" default="60" />
+        <setting name="thermal_throttle_threshold" type="float" default="40.0" />
+        
+        <!-- Battery degradation -->
+        <setting name="battery_degradation_enabled" type="boolean" default="true" />
+        <setting name="degradation_rate" type="float" default="0.008" />
+        <setting name="non_linear_factor" type="float" default="1.5" />
+        
+        <!-- Charging behavior -->
+        <setting name="charging_behavior_enabled" type="boolean" default="true" />
+        <setting name="fast_charge_watts" type="float" default="20.0" />
+        <setting name="trickle_charge_watts" type="float" default="3.5" />
+        <setting name="adaptive_charging" type="boolean" default="true" />
+        
+        <!-- Battery health -->
+        <setting name="device_age_months" type="integer" default="6" />
+        <setting name="manufacturing_variance" type="float" default="0.0" />
+    </hook>
+
+    <!-- Hook 08 Realism: Network Quality & Handover (IMPROVED) -->
+    <hook id="hook_08_realism" name="NetworkQualityRealism">
+        <setting name="enabled" type="boolean" default="true" />
+        <setting name="intensity" type="float" default="0.5" min="0.0" max="1.0" />
+        
+        <!-- WiFi Assist -->
+        <setting name="wifi_assist_enabled" type="boolean" default="true" />
+        <setting name="wifi_assist_latency" type="integer" default="300" />
+        <setting name="wifi_assist_download" type="float" default="1.0" />
+        
+        <!-- Captive portal -->
+        <setting name="captive_portal_enabled" type="boolean" default="true" />
+        <setting name="captive_portal_delay_ms" type="integer" default="3000" />
+        
+        <!-- Network debouncing -->
+        <setting name="debouncing_enabled" type="boolean" default="true" />
+        <setting name="debounce_window_ms" type="integer" default="20000" />
+        
+        <!-- Background restrictions -->
+        <setting name="background_restriction_enabled" type="boolean" default="true" />
+        <setting name="background_throttle_factor" type="float" default="0.30" />
+        
+        <!-- Congestion -->
+        <setting name="congestion_enabled" type="boolean" default="true" />
+        <setting name="peak_hour_multiplier" type="float" default="2.5" />
+        
+        <!-- VPN effects -->
+        <setting name="vpn_effects_enabled" type="boolean" default="true" />
+        <setting name="vpn_latency_ms" type="integer" default="100" />
+        <setting name="vpn_bandwidth_loss" type="float" default="0.20" />
+    </hook>
+
 </hooks_configuration>
